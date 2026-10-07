@@ -1,0 +1,21 @@
+<section id="{{ componentId }}" class="component section" data-component-id="{{ componentId }}">
+  <div class="wrap">
+    <div class="section-head center">
+      <span class="eyebrow eyebrow-centered">{{ 'legal.eyebrow' | t }}</span>
+      {% if properties.title %}
+        <h1 class="title">{{ properties.title | renderString }}</h1>
+      {% else %}
+        <h1 class="title">Terms of Service</h1>
+      {% endif %}
+      <p class="sub">{{ shop.name }} — {{ 'legal.updated_note' | t }}</p>
+    </div>
+
+    <div class="max-w-3xl mx-auto">
+      <div class="gcard p-6 md:p-10">
+        <div class="editor legal-body">
+          {{ terms_of_service | safe }}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

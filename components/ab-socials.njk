@@ -1,0 +1,7 @@
+<section id="{{ componentId }}" class="component ab-section ab-socials" data-component-id="{{ componentId }}" {% render_snippet 'ab-section-style.njk' %}>
+  <div><p class="ab-eyebrow">{{ properties.eyebrow or 'BEYOND THE STORE' }}</p><h2>{{ properties.title or 'Stay in the loop.' }}</h2><p class="ab-muted">{{ properties.description }}</p></div>
+  <div class="ab-social-links">
+    {% for item in properties.items %}<a class="ab-button" href="{{ item.link }}" {% if item.new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}><i class="{{ item.icon }}" aria-hidden="true"></i>{{ item.label }} <span aria-hidden="true">↗</span></a>{% endfor %}
+    {% if properties.use_shop_discord != false and shop.discord_url %}<a class="ab-button" href="{{ shop.discord_url }}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-discord" aria-hidden="true"></i>Join our Discord <span aria-hidden="true">↗</span></a>{% endif %}
+  </div>
+</section>

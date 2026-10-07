@@ -1,0 +1,15 @@
+<section class="v6-cart-note component" data-component-id="{{ componentId }}">
+  <div class="v6-cart-note__card">
+    {% if properties.icon %}<span class="v6-cart-note__icon"><i class="{{ properties.icon }}"></i></span>{% endif %}
+    <div class="v6-cart-note__body">
+      {% if properties.badge_text %}<span class="v6-cart-note__badge">{{ properties.badge_text | renderString }}</span>{% endif %}
+      {% if properties.title %}<strong>{{ properties.title | renderString }}</strong>{% endif %}
+      {% if properties.text %}<p>{{ properties.text | renderString }}</p>{% endif %}
+    </div>
+    {% if properties.show_button and properties.button_text %}
+      <a class="v6-cart-note__btn" href="{{ properties.button_link | shopUrl }}" {% if properties.button_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}>
+        {{ properties.button_text }}<i class="fa-solid fa-arrow-right"></i>
+      </a>
+    {% endif %}
+  </div>
+</section>

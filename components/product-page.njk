@@ -1,0 +1,386 @@
+{% set product_image_class = ('object-scale-down' if global.properties.product_image_fit == 'scale-down' else 'object-cover') %}
+
+<section id="{{ componentId }}" class="component section" data-component-id="{{ componentId }}">
+  <div class="wrap">
+    {% if breadcrumbs %}
+      <nav class="flex items-center flex-wrap gap-2 text-sm text-faint mb-8" aria-label="{{ 'common.breadcrumbs' | t }}">
+        {% for crumb in breadcrumbs %}
+          {% if crumb.url %}
+            <a href="{{ crumb.url }}" class="hover:text-t-primary transition">{{ crumb.name }}</a>
+          {% else %}
+            <span class="text-muted">{{ crumb.name }}</span>
+          {% endif %}
+          {% if not loop.last %}<span class="opacity-50">/</span>{% endif %}
+        {% endfor %}
+      </nav>
+    {% endif %}
+
+    <div class="flex flex-col gap-8 lg:flex-row lg:gap-10">
+      {# ---- Gallery + details ---- #}
+      <div class="lg:w-3/5 min-w-0">
+        <div class="gcard overflow-hidden">
+          {% if product.image_urls|length > 0 or product.image_url %}
+            <div class="relative aspect-product-page-image border-b" style="border-color: color-mix(in srgb, rgb(var(--cl-t-primary)) 7%, transparent);">
+              {% if product.image_urls|length > 0 %}
+                <div class="splide main h-full">
+                  <div class="splide__track h-full aspect-product-page-image">
+                    <ul class="splide__list">
+                      {% for image in product.image_urls %}
+                        <li class="splide__slide">
+                          <img src="{{ image }}" alt="{{ product.name }}" class="size-full object-product-image" style="{{ 'display: none;' if loop.index > 1 }}" />
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+                </div>
+              {% elif product.image_url %}
+                <img src="{{ product.image_url }}" alt="{{ product.name }}" class="size-full object-product-image" />
+              {% endif %}
+
+              {% if product.product_badges.page|length > 0 %}
+                <div class="absolute top-3 right-3 flex items-center gap-2 flex-wrap justify-end z-10">
+                  {% for productBadge in product.product_badges.page %}
+                    <span class="pill" style="background-color: {{ productBadge.color }}; border-color: transparent; color: #fff;" data-text="{{ productBadge.label }}" data-color="{{ productBadge.color }}">
+                      {% if productBadge.icon %}
+                        <i class="{{ productBadge.icon }} fa-fw" aria-hidden="true"></i>
+                      {% endif %}
+                      {{ productBadge.label }}
+                    </span>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+          {% endif %}
+
+          <div x-data="{ activeTab: 'description' }">
+            <div class="p-5 md:p-7">
+              <div class="flex flex-col gap-2 mb-4 sm:flex-row sm:items-center sm:justify-between">
+                <h1 class="flex-1 font-display text-xl font-bold tracking-tight truncate md:text-2xl">
+                  {{ product.name }}
+                </h1>
+                {% if product.status_color or product.status_text %}
+                  <div class="flex items-center gap-2.5 status" data-color="{{ product.status_color }}" data-label="{{ product.status_text }}">
+                    <div class="relative size-3.5 rounded-full" style="background-color: {{ product.status_color }}">
+                      <div class="pulsating" style="background-color: {{ product.status_color }}"></div>
+                    </div>
+                    <span class="text-sm font-semibold" style="color: {{ product.status_color }}">
+                      {{ product.status_text }}
+                    </span>
+                  </div>
+                {% endif %}
+              </div>
+
+              {% if product.category_id %}
+                <a href="{{ product.category.url }}" class="pill pill-accent mb-4 w-fit">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="size-3" viewBox="0 0 24 24" fill="currentColor"><path d="M5 11q-.825 0-1.412-.587T3 9V5q0-.825.588-1.412T5 3h4q.825 0 1.413.588T11 5v4q0 .825-.587 1.413T9 11zm0 10q-.825 0-1.412-.587T3 19v-4q0-.825.588-1.412T5 13h4q.825 0 1.413.588T11 15v4q0 .825-.587 1.413T9 21zm10-10q-.825 0-1.412-.587T13 9V5q0-.825.588-1.412T15 3h4q.825 0 1.413.588T21 5v4q0 .825-.587 1.413T19 11zm0 10q-.825 0-1.412-.587T13 19v-4q0-.825.588-1.412T15 13h4q.825 0 1.413.588T21 15v4q0 .825-.587 1.413T19 21z"/></svg>
+                  {{ product.category.name }}
+                </a>
+              {% endif %}
+
+              {% if product.product_tabs|length > 0 %}
+                <div class="filter-pills mb-5">
+                  <button type="button" @click="activeTab = 'description'" class="filter-pill" :class="activeTab != 'description' ? '' : 'active'">
+                    {{ 'common.description' | t }}
+                  </button>
+                  {% for productTab in product.product_tabs %}
+                    <button type="button" @click="activeTab = '{{ productTab.slug }}'" class="filter-pill" :class="activeTab != '{{ productTab.slug }}' ? '' : 'active'">
+                      {{ productTab.title }}
+                    </button>
+                  {% endfor %}
+                </div>
+              {% endif %}
+
+              <div>
+                <template x-if="activeTab == 'description'">
+                  <div class="text-t-primary editor text-[0.95rem] leading-relaxed">
+                    {{ product.description | safe }}
+                  </div>
+                </template>
+                {% for productTab in product.product_tabs %}
+                  <template x-if="activeTab == '{{ productTab.slug }}'">
+                    <div class="text-t-primary editor text-[0.95rem] leading-relaxed">
+                      {{ productTab.content | safe }}
+                    </div>
+                  </template>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {# ---- Purchase panel ---- #}
+      <div class="lg:w-2/5 min-w-0">
+        <div x-data="productForm" class="lg:sticky lg:top-24">
+          <div class="gcard gcard-glow overflow-hidden">
+            <div class="p-5 md:p-6 pb-0">
+              <div class="flex justify-between items-start gap-4 flex-wrap">
+                <div>
+                  <p class="text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-faint">{{ 'product.total_price' | t }}</p>
+                  <div class="flex items-end gap-2 mt-1">
+                    <div class="tgrad font-display text-3xl font-bold tracking-tight">
+                      <span x-text="appCurrency.format(totalPrice, '{{ product.currency }}')"></span>
+                    </div>
+                    <div class="text-sm text-faint mb-1">
+                      <span x-text="appCurrency.format(unitPrice, '{{ product.currency }}')"></span> each
+                    </div>
+                  </div>
+                </div>
+                <div class="text-right">
+                  {% if product.visibility == 'on_hold' %}
+                    <span class="stock-chip stock-out">{{ 'product.on_hold' | t }}</span>
+                  {% else %}
+                    <div x-show="activeVariant in product.variants">
+                      <span x-show="product.variants[activeVariant].stock > 0 || product.variants[activeVariant].stock === -1">
+                        <span x-show="product.variants[activeVariant].stock === -1" class="stock-chip stock-in">
+                          <span class="dot" style="background: rgb(var(--status-positive))"></span>
+                          {{ 'product.in_stock' | t }}
+                        </span>
+                        <span x-show="product.variants[activeVariant].stock > 0 && !product.hide_stock_count" class="stock-chip stock-in">
+                          <span class="dot" style="background: rgb(var(--status-positive))"></span>
+                          <span x-text="product.variants[activeVariant].stock + ' In Stock'"></span>
+                        </span>
+                        <span x-show="product.variants[activeVariant].stock > 0 && product.hide_stock_count" class="stock-chip stock-in">
+                          <span class="dot" style="background: rgb(var(--status-positive))"></span>
+                          {{ 'product.in_stock' | t }}
+                        </span>
+                      </span>
+                      <span x-show="product.variants[activeVariant].stock === 0" x-cloak class="stock-chip stock-out">
+                        <span class="dot" style="background: rgb(var(--status-error))"></span>
+                        {{ 'product.out_of_stock' | t }}
+                      </span>
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+            {% render_snippet "product-form.njk", product=product %}
+
+            {% if 'sales' in liveStats or 'views' in liveStats %}
+              <div class="flex flex-col gap-2.5 p-5 md:p-6 text-[0.82rem] text-muted" style="border-top: 1px solid color-mix(in srgb, rgb(var(--cl-t-primary)) 7%, transparent);">
+                {% if 'views' in liveStats %}
+                  <div class="flex items-center gap-2.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="size-4" style="color: rgb(var(--cl-accent))" fill="currentColor" viewBox="0 0 256 256"><path d="M247.31,124.76c-.35-.79-8.82-19.58-27.65-38.41C194.57,61.26,162.88,48,128,48S61.43,61.26,36.34,86.35C17.51,105.18,9,124,8.69,124.76a8,8,0,0,0,0,6.5c.35.79,8.82,19.57,27.65,38.4C61.43,194.74,93.12,208,128,208s66.57-13.26,91.66-38.34c18.83-18.83,27.3-37.61,27.65-38.4A8,8,0,0,0,247.31,124.76ZM128,168a40,40,0,1,1,40-40A40,40,0,0,1,128,168Z"></path></svg>
+                    <p>{{ ('product.viewing_one' if liveStats.views == 1 else 'product.viewing_many') | t({ count: liveStats.views }) | safe }}</p>
+                  </div>
+                {% endif %}
+                {% if 'sales' in liveStats %}
+                  {% set salesCountHoursLabelMap = {
+                    '1': ('product.window_hour' | t),
+                    '6': ('product.window_6_hours' | t),
+                    '12': ('product.window_12_hours' | t),
+                    '24': ('product.window_24_hours' | t),
+                    '168': ('product.window_7_days' | t),
+                    '720': ('product.window_30_days' | t)
+                  } %}
+                  <div class="flex items-center gap-2.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="size-4" style="color: rgb(var(--cl-accent))" fill="currentColor" viewBox="0 0 256 256"><path d="M230.14,58.87A8,8,0,0,0,224,56H62.68L56.6,22.57A8,8,0,0,0,48.73,16H24a8,8,0,0,0,0,16h18L67.56,172.29a24,24,0,0,0,5.33,11.27,28,28,0,1,0,44.4,8.44h45.42A27.75,27.75,0,0,0,160,204a28,28,0,1,0,28-28H91.17a8,8,0,0,1-7.87-6.57L80.13,152h116a24,24,0,0,0,23.61-19.71l12.16-66.86A8,8,0,0,0,230.14,58.87ZM104,204a12,12,0,1,1-12-12A12,12,0,0,1,104,204Zm96,0a12,12,0,1,1-12-12A12,12,0,0,1,200,204Zm4-74.57A8,8,0,0,1,196.1,136H77.22L65.59,72H214.41Z"></path></svg>
+                    <p>
+                      {% set purchaseSuffix = ('product.purchased_window' | t({ window: salesCountHoursLabelMap[product.sales_count_hours] })) if product.sales_count_hours in salesCountHoursLabelMap else '.' %}
+                      {{ ('product.purchased_one' if liveStats.sales == 1 else 'product.purchased_many') | t({ count: liveStats.sales, suffix: purchaseSuffix }) | safe }}
+                    </p>
+                  </div>
+                {% endif %}
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {# ---- Reviews ---- #}
+    {% if properties.show_feedbacks != false and ((product.feedback_count is defined and product.feedback_count > 0) or (feedbacks and feedbacks|length > 0)) %}
+      <div class="mt-16">
+        <div class="section-head">
+          <span class="eyebrow">{{ 'feedback.eyebrow' | t }}</span>
+          <h2 class="title">{{ 'product.reviews_title' | t }}</h2>
+        </div>
+        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
+          {% for feedback in feedbacks.slice(0, 4) %}
+            {% render_snippet "feedback-card.njk", feedback=feedback %}
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+
+    {# ---- Upsells ---- #}
+    {% if productUpsells.length > 0 %}
+      <div class="mt-16">
+        <div class="section-head">
+          <span class="eyebrow">{{ 'product.upsell_eyebrow' | t }}</span>
+          <h2 class="title">{{ 'product.commonly_bought_together' | t }}</h2>
+        </div>
+        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
+          {% set ogProduct = product %}
+          {% for upsell in productUpsells %}
+            <div class="w-full">
+              {% render_snippet "product-card.njk", product=upsell %}
+            </div>
+          {% endfor %}
+          {% set product = ogProduct %}
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+{% if 'latestOrders' in liveStats and liveStats.latestOrders|length > 0 %}
+  <link href="https://cdn.jsdelivr.net/npm/flag-icons@7.3.2/css/flag-icons.min.css" rel="stylesheet" integrity="sha256-tyPeBlnZW2qWbAF1hQiCt9qo6SOgOSymvJBum+FrrwI=" crossorigin="anonymous">
+  <div
+    x-data="salesNotifications"
+    x-cloak
+    class="relative"
+  >
+    <div
+      x-show="show"
+      x-transition:enter="transition-transform ease-in-out duration-500"
+      x-transition:enter-start="transform translate-y-full"
+      x-transition:enter-end="transform translate-y-0"
+      x-transition:leave="transition-transform ease-in duration-500"
+      x-transition:leave-start="transform translate-y-0"
+      x-transition:leave-end="transform translate-y-full"
+      class="fixed z-50 bottom-4 left-4 right-4 sm:right-auto"
+    >
+      <template x-if="order">
+        <div class="gcard flex items-center gap-3 p-2 pr-4 group !rounded-2xl">
+          {% if product.image_urls|length > 0 %}
+            <div class="relative">
+              <img src="{{ product.image_urls[0] }}" alt="{{ product.name }} image" class="size-[3.75rem] object-cover rounded-xl sm:size-[4.5rem]">
+            </div>
+          {% endif %}
+          <div class="truncate pr-2">
+            <p class="text-xs text-muted truncate sm:text-sm">
+              {{ 'product.someone' | t }}
+              <template x-if="order.country_code">
+                <span>
+                  from <i :class="`size-[0.625rem] sm:size-3 rounded fi fi-${order.country_code.toLowerCase()}`"></i>
+                </span>
+              </template>
+              purchased
+            </p>
+            <p class="text-sm text-t-primary font-medium truncate sm:text-base">
+              {{ product.name }}
+            </p>
+            <p class="text-xs text-muted truncate sm:text-sm">
+              <span x-text="getTimeAgo(order.completed_at)"></span>
+            </p>
+          </div>
+        </div>
+      </template>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('alpine:init', () => {
+      Alpine.data('salesNotifications', () => ({
+        displayTime: 8000,
+        initTimeMin: 2000,
+        initTimeMax: 4000,
+        nextTimeMin: 8000,
+        nextTimeMax: 12000,
+
+        latestOrders: {{ liveStats.latestOrders | json }},
+        show: false,
+
+        get order() {
+          return this.latestOrders.length > 0 ? this.latestOrders[0] : null;
+        },
+
+        getRandomInterval(min, max) {
+          return Math.floor(Math.random() * (max - min + 1)) + min;
+        },
+
+        getTimeAgo(input) {
+          const date = (input instanceof Date) ? input : new Date(input);
+          const formatter = new Intl.RelativeTimeFormat('en');
+          const ranges = {
+            years: 3600 * 24 * 365,
+            months: 3600 * 24 * 30,
+            weeks: 3600 * 24 * 7,
+            days: 3600 * 24,
+            hours: 3600,
+            minutes: 60,
+            seconds: 1
+          };
+          const secondsElapsed = (date.getTime() - Date.now()) / 1000;
+          for (let key in ranges) {
+            if (ranges[key] < Math.abs(secondsElapsed)) {
+              const delta = secondsElapsed / ranges[key];
+              return formatter.format(Math.round(delta), key);
+            }
+          }
+
+          return 'just now';
+        },
+
+        showNotification() {
+          if (this.latestOrders.length === 0) return;
+
+          this.show = true;
+          setTimeout(() => {
+            this.show = false;
+
+            setTimeout(() => {
+              this.latestOrders.shift();
+
+              if (this.latestOrders.length > 0) {
+                setTimeout(() => this.showNotification(), this.getRandomInterval(this.nextTimeMin, this.nextTimeMax));
+              }
+            }, 500);
+          }, this.displayTime);
+        },
+
+        init() {
+          setTimeout(() => this.showNotification(), this.getRandomInterval(this.initTimeMin, this.initTimeMax));
+        }
+      }));
+    });
+  </script>
+{% endif %}
+
+<script>
+  window.addEventListener('load', () => {
+    const arrows = {{ 'true' if product.image_urls|length > 1 else 'false' }};
+
+    if (document.querySelector('.splide.main')) {
+      window.splideMain = new Splide('.splide.main', {
+        type: 'slide',
+        pagination: false,
+        autoHeight: true,
+        arrows
+      });
+
+      window.splideMain.mount();
+    }
+
+    document.querySelectorAll('.splide__slide img').forEach((img) => {
+      img.style.removeProperty('display');
+    });
+
+    document.querySelectorAll('.splide__slide img').forEach((img) => {
+      img.style.removeProperty('display');
+    });
+  });
+</script>
+<script>
+  /* Recently-viewed capture: real product data for cart recommendations */
+  (function () {
+    try {
+      var list = JSON.parse(localStorage.getItem('recently_viewed') || '[]');
+      if (!Array.isArray(list)) list = [];
+      list = list.filter(function (i) { return String(i.id) !== String({{ product.id | json }}); });
+      list.unshift({
+        id: {{ product.id | json }},
+        name: {{ product.name | json }},
+        image: {{ (product.image_urls[0] if product.image_urls|length > 0 else (product.image_url or '')) | json }},
+        price: {{ product.min_price | default(0) | json }},
+        currency: {{ product.currency | json }},
+        url: {{ ('/product/' + product.path) | shopUrl | json }},
+        statusText: {{ (product.status_text or '') | json }},
+        statusColor: {{ (product.status_color or '') | json }}
+      });
+      localStorage.setItem('recently_viewed', JSON.stringify(list.slice(0, 12)));
+    } catch (e) {}
+  })();
+</script>

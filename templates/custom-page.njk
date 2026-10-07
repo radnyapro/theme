@@ -1,0 +1,28 @@
+{#
+  To show different content based on the custom page, you can use the following code snippet.
+  Replace 'about-us' and 'contact' with the actual paths of your custom pages defined in the Visual Editor.
+
+  {% if custom_page.path == 'about-us' %}
+    {{ 'affiliate.code_placeholder_short' | t }}
+  {% elif custom_page.path == 'contact' %}
+    {{ 'affiliate.code_placeholder_short' | t }}
+  {% else %}
+    {{ 'affiliate.default_code_placeholder' | t }}
+  {% endif %}
+#}
+
+<div class="section relative overflow-hidden">
+  <div class="absolute inset-x-0 top-0 h-full pointer-events-none" aria-hidden="true" style="background: radial-gradient(48rem 26rem at 50% 0%, color-mix(in srgb, rgb(var(--cl-accent)) 10%, transparent), transparent 70%);"></div>
+  <div class="wrap relative">
+    <div class="section-head center">
+      <span class="eyebrow eyebrow-centered">{{ custom_page.name }}</span>
+      <h1 class="title" style="font-size: clamp(2.1rem, 4.6vw, 3.4rem);">{{ custom_page.name }}</h1>
+    </div>
+  </div>
+</div>
+
+<div class="components">
+  {% for componentId in components_order %}
+    {% render_component componentId %}
+  {% endfor %}
+</div>

@@ -1,0 +1,26 @@
+<section id="{{ componentId }}" class="component section" data-component-id="{{ componentId }}">
+  <div class="wrap">
+    <div class="relative overflow-hidden rounded-[var(--radius-card)] border text-center"
+      style="border-color: color-mix(in srgb, rgb(var(--cl-accent)) 26%, transparent); background:
+        radial-gradient(38rem 20rem at 50% 120%, color-mix(in srgb, rgb(var(--cl-accent-2)) 16%, transparent), transparent 70%),
+        linear-gradient(165deg, color-mix(in srgb, rgb(var(--cl-card)) 80%, rgb(var(--cl-accent-2)) 8%), color-mix(in srgb, rgb(var(--cl-background)) 75%, black));">
+      <div class="relative px-6 py-14 md:px-12 md:py-20">
+        {% if properties.eyebrow %}
+          <span class="pill pill-accent mb-5">{{ properties.eyebrow | renderString }}</span>
+        {% endif %}
+        <h2 class="font-display font-bold tracking-tight mx-auto max-w-2xl" style="font-size: clamp(1.85rem, 3.6vw, 2.9rem); line-height: 1.1;">
+          {{ properties.title | renderString }}{% if properties.title_accent %} <span class="tgrad">{{ properties.title_accent | renderString }}</span>{% endif %}
+        </h2>
+        {% if properties.subtitle %}
+          <p class="text-muted mx-auto mt-4 max-w-xl text-[0.95rem] leading-relaxed">{{ properties.subtitle | renderString }}</p>
+        {% endif %}
+        {% if properties.button_text %}
+          <a href="{{ properties.button_link | shopUrl }}" class="btn btn-bloom btn-lg mt-8">
+            {{ properties.button_text | renderString }}
+            <svg xmlns="http://www.w3.org/2000/svg" class="size-4" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>

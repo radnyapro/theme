@@ -1,0 +1,4 @@
+<section id="{{ componentId }}" class="component ab-section ab-support" data-component-id="{{ componentId }}" {% render_snippet 'ab-section-style.njk' %}>
+  <div class="ab-support-icon"><i class="fa-solid fa-headset" aria-hidden="true"></i></div><div><h2>{{ properties.title or 'A little help goes a long way.' }}</h2><p class="ab-muted">{{ properties.description or 'Check product status or get in touch with us.' }}</p></div>
+  <div class="ab-actions"><a class="ab-button" href="{{ '/status' | shopUrl }}">Product status</a><a class="ab-button ab-primary" href="{{ properties.support_url or shop.discord_url or ('/customer/tickets' | shopUrl) }}">{{ properties.button_label or 'Get support' }} ↗</a></div>
+</section>

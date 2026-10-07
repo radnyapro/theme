@@ -1,0 +1,14 @@
+<section id="{{ componentId }}" class="component ab-section ab-hero {{ 'ab-no-grid' if properties.show_grid == false }}" data-component-id="{{ componentId }}" {% render_snippet 'ab-section-style.njk' %}>
+  <div class="ab-orbit" aria-hidden="true"></div>
+  <div class="ab-hero-content">
+    {% if properties.eyebrow %}<p class="ab-eyebrow ab-hero-badge"><span class="ab-dot"></span>{{ properties.eyebrow }}</p>{% endif %}
+    <h1>{{ properties.title or 'Your next game.' }}<br><span>{{ properties.highlight or 'A better experience.' }}</span></h1>
+    {% if properties.description %}<p class="ab-lead">{{ properties.description }}</p>{% endif %}
+    <div class="ab-actions">
+      {% if properties.primary_label %}<a class="ab-button ab-primary" href="{{ (properties.primary_link or '/#products') | shopUrl }}">{{ properties.primary_label }} <span aria-hidden="true">↗</span></a>{% endif %}
+      {% if properties.secondary_label %}<a class="ab-button" href="{{ (properties.secondary_link or '/status') | shopUrl }}">{{ properties.secondary_label }} <span aria-hidden="true">→</span></a>{% endif %}
+    </div>
+    {% if properties.trust_note %}<p class="ab-trust-note"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> {{ properties.trust_note }}</p>{% endif %}
+    {% if properties.image %}<img class="ab-hero-media" src="{{ properties.image | imageUrl }}" alt="{{ properties.image_alt or '' }}">{% endif %}
+  </div>
+</section>

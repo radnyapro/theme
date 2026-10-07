@@ -1,0 +1,33 @@
+{% set items = properties.items if properties.items and properties.items|length > 0 else [] %}
+
+<section class="v6-pay component" data-component-id="{{ componentId }}">
+  {% if properties.title or properties.subtitle %}
+  <div class="v6-section-head">
+    {% if properties.title %}<h2>{{ properties.title | renderString }}</h2>{% endif %}
+    {% if properties.subtitle %}<p>{{ properties.subtitle | renderString }}</p>{% endif %}
+  </div>
+  {% endif %}
+
+  {% if items|length > 0 %}
+    {% set half = (items|length / 2) | round(0, 'ceil') %}
+    {% set rowOne = items.slice(0, half) %}
+    {% set rowTwo = items.slice(half) %}
+    {% if rowTwo|length == 0 %}{% set rowTwo = rowOne %}{% endif %}
+    <div class="v6-marquee v6-pay__marquee">
+      <div class="v6-marquee__row v6-marquee__row--a">
+        <div class="v6-marquee__track">
+          {% for item in rowOne %}{% render_snippet "payment-badge.njk", item=item %}{% endfor %}
+          {% for item in rowOne %}{% render_snippet "payment-badge.njk", item=item %}{% endfor %}
+        </div>
+      </div>
+      <div class="v6-marquee__row v6-marquee__row--b">
+        <div class="v6-marquee__track">
+          {% for item in rowTwo %}{% render_snippet "payment-badge.njk", item=item %}{% endfor %}
+          {% for item in rowTwo %}{% render_snippet "payment-badge.njk", item=item %}{% endfor %}
+        </div>
+      </div>
+      <div class="v6-marquee__fade v6-marquee__fade--left" aria-hidden="true"></div>
+      <div class="v6-marquee__fade v6-marquee__fade--right" aria-hidden="true"></div>
+    </div>
+  {% endif %}
+</section>

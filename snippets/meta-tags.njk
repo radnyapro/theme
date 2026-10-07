@@ -1,0 +1,92 @@
+{%- set title = shop.meta_title -%}
+{%- set description = shop.meta_description -%}
+{%- set image = shop.meta_image_url -%}
+{%- set twitterCard = shop.meta_twitter_card -%}
+{%- set title_divider = ' - ' -%}
+{%- set description_divider = ' ' -%}
+
+{%- if templateName == 'products' -%}
+  {%- if category -%}
+    {%- set title = category.meta_title ~ title_divider ~ shop.meta_title -%}
+    {%- set description = category.meta_description ~ description_divider ~ shop.meta_description -%}
+    {%- set image = category.meta_image_url if category.meta_image_url else image -%}
+  {%- else -%}
+    {%- set title = ('meta.products_title' | t) ~ title_divider ~ shop.meta_title -%}
+    {%- set description = ('meta.products_description' | t) ~ description_divider ~ shop.meta_description -%}
+  {%- endif -%}
+{%- elif templateName == 'product' -%}
+  {%- set title = product.meta_title ~ title_divider ~ shop.meta_title -%}
+  {%- set description = product.meta_description ~ description_divider ~ shop.meta_description -%}
+  {%- set image = product.meta_image_url if product.meta_image_url else image -%}
+  {%- set twitterCard = product.meta_twitter_card -%}
+{%- elif templateName == 'cart' -%}
+  {%- set title = ('meta.cart_title' | t) ~ title_divider ~ shop.meta_title -%}
+  {%- set description = ('meta.cart_description' | t) ~ description_divider ~ shop.meta_description -%}
+{%- elif templateName == 'terms' -%}
+  {%- set title = ('meta.terms_title' | t) ~ title_divider ~ shop.meta_title -%}
+  {%- set description = ('meta.terms_description' | t) ~ description_divider ~ shop.meta_description -%}
+{%- elif templateName == 'privacy-policy' -%}
+  {%- set title = ('meta.privacy_title' | t) ~ title_divider ~ shop.meta_title -%}
+  {%- set description = ('meta.privacy_description' | t) ~ description_divider ~ shop.meta_description -%}
+{%- elif templateName == 'refund-policy' -%}
+  {%- set title = ('meta.refund_title' | t) ~ title_divider ~ shop.meta_title -%}
+  {%- set description = ('meta.refund_description' | t) ~ description_divider ~ shop.meta_description -%}
+{%- elif templateName == 'feedback' -%}
+  {%- set title = ('meta.reviews_title' | t) ~ title_divider ~ shop.meta_title -%}
+  {%- set description = ('meta.reviews_description' | t({ count: feedbacks_paginator.total })) ~ description_divider ~ shop.meta_description -%}
+{%- elif templateName == 'status' -%}
+  {%- set title = ('meta.status_title' | t) ~ title_divider ~ shop.meta_title -%}
+  {%- set description = ('meta.status_description' | t) ~ description_divider ~ shop.meta_description -%}
+{%- elif templateName == 'faq' -%}
+  {%- set title = ('meta.faq_title' | t) ~ title_divider ~ shop.meta_title -%}
+  {%- set description = ('meta.faq_description' | t) ~ description_divider ~ shop.meta_description -%}
+{%- elif templateName == 'blog' -%}
+  {%- set title = ('meta.blog_title' | t) ~ title_divider ~ shop.meta_title -%}
+  {%- set description = ('meta.blog_description' | t) ~ description_divider ~ shop.meta_description -%}
+{%- elif templateName == 'blog-post' -%}
+  {%- set title = blogPost.meta_title ~ title_divider ~ shop.meta_title -%}
+  {%- set description = blogPost.meta_description ~ description_divider ~ shop.meta_description -%}
+  {%- set image = blogPost.image_url if blogPost.image_url else image -%}
+  {%- set twitterCard = 'summary_large_image' -%}
+{%- elif templateName == 'customer-dashboard' -%}
+  {%- set title = ('meta.dashboard_title' | t) ~ title_divider ~ shop.meta_title -%}
+{%- elif templateName == 'customer-invoices' -%}
+  {%- set title = ('meta.orders_title' | t) ~ title_divider ~ shop.meta_title -%}
+{%- elif templateName == 'customer-tickets' -%}
+  {%- set title = ('meta.tickets_title' | t) ~ title_divider ~ shop.meta_title -%}
+{%- elif templateName == 'customer-ticket' -%}
+  {%- set title = 'Ticket ' ~ ticket.subject ~ '' ~ title_divider ~ shop.meta_title -%}
+{%- elif templateName == 'customer-balance' -%}
+  {%- set title = 'My Balance' ~ title_divider ~ shop.meta_title -%}
+{%- elif templateName == 'customer-affiliate' -%}
+  {%- set title = 'Affiliate' ~ title_divider ~ shop.meta_title -%}
+{%- elif 'custom-page' in templateName -%}
+  {%- set title = name ~ '' ~ title_divider ~ shop.meta_title -%}
+  {%- set description = name ~ description_divider ~ shop.meta_description -%}
+{%- endif -%}
+
+<title>{{ title }}</title>
+<meta name="description" content="{{ description }}">
+<meta property="og:title" content="{{ title }}">
+<meta property="og:description" content="{{ description }}">
+<meta property="og:image" content="{{ image }}">
+<meta name="twitter:title" content="{{ title }}">
+<meta name="twitter:description" content="{{ description }}">
+<meta name="twitter:card" content="{{ twitterCard }}">
+<link rel="icon" type="image/png" href="{{ shop.favicon_url }}">
+<meta name="theme-color" content="{{ '' | themeColor }}" />
+
+{% if languages and languages | length > 1 %}
+{%- for language in languages %}
+<link rel="alternate" hreflang="{{ language.code }}" href="{{ language.url }}">
+{%- if language.code == defaultLang %}
+<link rel="alternate" hreflang="x-default" href="{{ language.url }}">
+{%- endif %}
+{%- endfor %}
+{% endif %}
+
+{% if schemaOrg %}
+<script type="application/ld+json">
+{{ schemaOrg | safe }}
+</script>
+{% endif %}

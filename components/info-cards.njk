@@ -1,0 +1,27 @@
+<section class="v6-info-cards component" data-component-id="{{ componentId }}">
+  <div class="py-6 lg:py-8">
+    {% if properties.title or properties.subtitle %}
+      <div class="v6-section-head">
+        {% if properties.title %}<h2>{{ properties.title | renderString }}</h2>{% endif %}
+        {% if properties.subtitle %}<p>{{ properties.subtitle | renderString }}</p>{% endif %}
+      </div>
+    {% endif %}
+
+    {% if properties.cards and properties.cards|length > 0 %}
+      <div class="v6-info-cards__grid">
+        {% for card in properties.cards %}
+          <div class="v6-info-card">
+            {% if card.icon %}<span class="v6-info-card__icon"><i class="{{ card.icon }}"></i></span>{% endif %}
+            {% if card.title %}<h3>{{ card.title | renderString }}</h3>{% endif %}
+            {% if card.text %}<p>{{ card.text | renderString }}</p>{% endif %}
+            {% if card.show_button and card.button_text %}
+              <a class="v6-info-card__link" href="{{ card.button_link }}" {% if card.button_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}>
+                <span>{{ card.button_text }}</span><i class="fa-solid fa-arrow-right"></i>
+              </a>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+</section>

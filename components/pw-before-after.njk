@@ -1,0 +1,10 @@
+<section id="{{ componentId }}" class="component ab-section pw-comparison-section" data-component-id="{{ componentId }}" {% render_snippet 'ab-section-style.njk' %}>
+  <div class="ab-section-heading"><div>{% if properties.eyebrow %}<p class="ab-eyebrow">{{ properties.eyebrow }}</p>{% endif %}<h2>{{ properties.title }}</h2>{% if properties.description %}<p class="ab-muted pw-body">{{ properties.description }}</p>{% endif %}</div></div>
+  <div class="pw-comparison" data-pw-comparison style="--pw-ratio:{{ properties.ratio or '16/9' }};--pw-split:50%">
+    {% if properties.after_image %}<img class="pw-comparison-image" src="{{ properties.after_image | imageUrl }}" alt="{{ properties.after_alt or properties.after_label }}" loading="lazy">{% else %}<div class="pw-media-placeholder">Add your after image</div>{% endif %}
+    <div class="pw-comparison-before">{% if properties.before_image %}<img class="pw-comparison-image" src="{{ properties.before_image | imageUrl }}" alt="{{ properties.before_alt or properties.before_label }}" loading="lazy">{% else %}<div class="pw-media-placeholder">Add your before image</div>{% endif %}</div>
+    <span class="pw-compare-label pw-before-label">{{ properties.before_label or 'Before' }}</span><span class="pw-compare-label pw-after-label">{{ properties.after_label or 'After' }}</span>
+    <div class="pw-compare-divider" aria-hidden="true"><span>↔</span></div>
+    <input class="pw-compare-range" type="range" min="0" max="100" value="{{ properties.start if properties.start != null else 50 }}" aria-label="Before and after comparison" aria-valuetext="50% before image">
+  </div>
+</section>

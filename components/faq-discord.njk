@@ -1,0 +1,108 @@
+{# ============================================================
+   FAQ Discord — "Join our Discord" handoff card.
+
+   Compact card aligned with the FAQ column: server icon, server
+   name, member + online counts and a Join Discord CTA. Stats and
+   the guild icon/name are fetched live from Discord's public
+   invite endpoint when possible (no keys, no bot tokens) and fall
+   back silently to the Visual Editor's manual values. Colors and
+   the button reuse the storefront's native classes and tokens.
+   ============================================================ #}
+{% set _fdInvite = properties.discord_url if properties.discord_url else shop.discord_url %}
+
+<section
+  id="{{ componentId }}"
+  class="component section-tight"
+  data-component-id="{{ componentId }}"
+  x-data="abDiscordCard({
+    invite: '{{ _fdInvite | jsEscape }}',
+    serverName: '{{ (properties.server_name if properties.server_name else shop.name) | jsEscape }}',
+    members: '{{ (properties.members if properties.members else '') | jsEscape }}',
+    online: '{{ (properties.online if properties.online else '') | jsEscape }}',
+    icon: '{{ (properties.server_icon | imageUrl) | jsEscape }}',
+    source: '{{ properties.stats_source if properties.stats_source else 'auto' }}'
+  )"
+>
+  <div class="wrap">
+    <div class="fdisc max-w-3xl mx-auto">
+      <span class="fdisc__icon" aria-hidden="true">
+        <template x-if="icon">
+          <img :src="icon" alt="" loading="lazy" />
+        </template>
+        <template x-if="!icon">
+          <i class="fa-brands fa-discord"></i>
+        </template>
+      </span>
+
+      <div class="fdisc__info">
+        {% if properties.heading %}
+          <span class="fdisc__kicker">{{ properties.heading | renderString }}</span>
+        {% endif %}
+        <strong class="fdisc__name" x-text="displayName"></strong>
+        <span class="fdisc__stats">
+          {% if properties.show_members is not defined or properties.show_members %}
+            <span class="fdisc__stat" x-show="members">
+              <i class="fa-solid fa-users" aria-hidden="true"></i>
+              <span x-text="members"></span><span>members</span>
+            </span>
+          {% endif %}
+          {% if properties.show_online is not defined or properties.show_online %}
+            <span class="fdisc__stat fdisc__stat--online" x-show="online">
+              <i aria-hidden="true"></i>
+              <span x-text="online"></span><span>online now</span>
+            </span>
+          {% endif %}
+        </span>
+      </div>
+
+      {% if _fdInvite %}
+        <a
+          href="{{ _fdInvite | shopUrl }}"
+          class="ab-button ab-primary fdisc__cta"
+          {% if properties.open_new_tab is not defined or properties.open_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+        >
+          <i class="fa-brands fa-discord" aria-hidden="true"></i>
+          <span>{{ (properties.button_text if properties.button_text else 'Join Discord') | renderString }}</span>
+        </a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<script>
+  document.addEventListener('alpine:init', () => {
+    Alpine.data('abDiscordCard', (cfg) => ({
+      cfg: cfg || {},
+      name: '',
+      members: '',
+      online: '',
+      icon: '',
+
+      get displayName() { return this.name || this.cfg.serverName || ''; },
+
+      get cleanInvite() {
+        const m = String(this.cfg.invite || '').match(/(?:discord\.gg|discord\.com\/invite)\/([\w-]+)/);
+        return m ? m[1] : null;
+      },
+
+      async init() {
+        this.name = this.cfg.serverName || '';
+        this.members = this.cfg.members || '';
+        this.online = this.cfg.online || '';
+        this.icon = this.cfg.icon || '';
+        if (this.cfg.source !== 'auto' || !this.cleanInvite) return;
+        try {
+          const res = await fetch('https://discord.com/api/v10/invites/' + this.cleanInvite + '?with_counts=true', { headers: { Accept: 'application/json' } });
+          if (!res.ok) return;
+          const data = await res.json();
+          if (data.approximate_member_count) this.members = Number(data.approximate_member_count).toLocaleString('en-US');
+          if (data.approximate_presence_count) this.online = Number(data.approximate_presence_count).toLocaleString('en-US');
+          if (data.guild && data.guild.name) this.name = data.guild.name;
+          if (data.guild && data.guild.id && data.guild.icon) {
+            this.icon = 'https://cdn.discordapp.com/icons/' + data.guild.id + '/' + data.guild.icon + '.png?size=128';
+          }
+        } catch (e) { /* keep manual values */ }
+      },
+    }));
+  });
+</script>

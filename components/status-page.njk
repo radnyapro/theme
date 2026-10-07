@@ -1,0 +1,69 @@
+<section id="{{ componentId }}" class="component section" data-component-id="{{ componentId }}">
+  <div class="wrap">
+    <div class="section-head center">
+      <span class="eyebrow eyebrow-centered">{{ 'status.eyebrow' | t }}</span>
+      {% if properties.title %}
+        <h1 class="title">{{ properties.title | renderString }}</h1>
+      {% else %}
+        <h1 class="title">{{ 'status.default_title' | t }}</h1>
+      {% endif %}
+      <p class="sub">{{ 'status.subtitle' | t }}</p>
+    </div>
+
+    <div class="max-w-3xl mx-auto">
+      {# Overall banner: derived from the real product statuses below #}
+      {% set downList = [] %}
+      {% set warnList = [] %}
+      {% for item in statuses %}
+        {% set statusProducts = item.products if item.type == 'group' else [item] %}
+        {% for product in statusProducts %}
+          {% if product.status_text %}
+            {% set st = product.status_text | lower %}
+            {% if st in ['down', 'offline', 'major outage'] %}
+              {% set _ = downList.push(st) %}
+            {% elif st not in ['operational', 'online', 'up', ''] %}
+              {% set _ = warnList.push(st) %}
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+      {% endfor %}
+
+      <div class="banner-ok{% if downList | length > 0 %} status-banner-down{% elif warnList | length > 0 %} status-banner-warn{% endif %}">
+        <div class="flex flex-col items-center gap-3 p-6 text-center sm:flex-row sm:text-left sm:justify-center sm:gap-4 sm:p-7">
+          {% if downList | length > 0 %}
+            <span class="dot dot-pulse size-3" style="background: rgb(var(--status-error))"></span>
+            <p class="font-display text-lg font-bold tracking-tight" style="color: rgb(var(--status-error))">{{ 'status.some_down' | t }}</p>
+          {% elif warnList | length > 0 %}
+            <span class="dot dot-pulse size-3" style="background: rgb(var(--status-warning))"></span>
+            <p class="font-display text-lg font-bold tracking-tight" style="color: rgb(var(--status-warning))">{{ 'status.some_degraded' | t }}</p>
+          {% else %}
+            <span class="dot dot-pulse size-3" style="background: rgb(var(--status-positive))"></span>
+            <p class="font-display text-lg font-bold tracking-tight" style="color: rgb(var(--status-positive))">{{ 'status.all_operational' | t }}</p>
+          {% endif %}
+          <span class="text-sm text-muted">{{ 'status.auto_note' | t }}</span>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-4 mt-8">
+        {% for item in statuses %}
+          {% if item.type == 'group' %}
+            <div class="mt-4">
+              <h2 class="text-base font-semibold mb-3 md:text-lg tracking-tight">{{ item.name }}</h2>
+              <div class="flex flex-col gap-3">
+                {% for product in item.products %}
+                  {% render_snippet "status-card.njk", product=product %}
+                {% endfor %}
+              </div>
+            </div>
+          {% elif not item.group_id %}
+            {% render_snippet "status-card.njk", product=item %}
+          {% endif %}
+        {% endfor %}
+      </div>
+
+      <p class="text-center text-xs text-faint mt-8">
+        {{ 'status.updated_note' | t }}
+      </p>
+    </div>
+  </div>
+</section>

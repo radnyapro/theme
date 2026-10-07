@@ -1,0 +1,169 @@
+{% set data = [] %}
+{% if feedbacks %}
+  {% set data = feedbacks %}
+{% elif latest_feedbacks %}
+  {% set data = latest_feedbacks %}
+{% endif %}
+
+<section id="{{ componentId }}" class="component section" data-component-id="{{ componentId }}">
+  <div class="wrap">
+    <div class="section-head {{ 'center' if properties.center_head }}">
+      <span class="eyebrow {{ 'eyebrow-centered' if properties.center_head }}">{{ properties.eyebrow if properties.eyebrow else 'feedback.eyebrow' | t }}</span>
+      {% if properties.title %}
+        <h2 class="title">{{ properties.title | renderString }}{% if properties.title_accent %} <span class="tgrad">{{ properties.title_accent | renderString }}</span>{% endif %}</h2>
+      {% endif %}
+      {% if properties.subtitle %}
+        <p class="sub">{{ properties.subtitle | renderString }}</p>
+      {% endif %}
+    </div>
+
+    {# Aggregate block on the dedicated reviews page #}
+    {% if templateName == 'feedback' and shop.average_rating %}
+      <div class="gcard gcard-glow mb-8 p-6 md:p-8 flex flex-col items-center gap-6 md:flex-row md:justify-between">
+        <div class="flex items-center gap-5">
+          <p class="tgrad font-display text-5xl font-bold tracking-tight">{{ helpers.numbers.formatDecimal(shop.average_rating) }}</p>
+          <div>
+            <div class="stars mb-1.5">
+              {% for i in range(5) %}
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-4 {{ 'opacity-25' if i >= (shop.average_rating | round(0, 'floor')) }}">
+                  <path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd" />
+                </svg>
+              {% endfor %}
+            </div>
+            <p class="text-sm text-muted">{{ 'feedback.based_on' | t({ count: shop.total_feedbacks }) }}</p>
+          </div>
+        </div>
+        <div class="flex flex-wrap justify-center gap-2">
+          <span class="pill"><span class="tgrad font-semibold font-display">{{ helpers.numbers.formatCompact(shop.products_sold) }}</span>{{ 'stats.orders' | t }}</span>
+          <span class="pill"><span class="tgrad font-semibold font-display">{{ helpers.numbers.formatCompact(shop.total_customers) }}</span>{{ 'stats.customers' | t }}</span>
+        </div>
+      </div>
+    {% endif %}
+
+    {% if templateName == 'feedback' and data|length > 0 %}
+      <div class="flex my-6 md:my-8 md:justify-end">
+        <div class="flex flex-col gap-2 md:flex-row md:items-center md:gap-4 md:min-w-lg">
+          <div class="text-sm text-muted">
+            {{ 'feedback.sort_by' | t }}
+          </div>
+          <div class="min-w-72">
+            <select class="order-select">
+              <option value="created_at_desc">
+                {{ 'feedback.sort_newest' | t }}
+              </option>
+              <option value="created_at_asc">
+                {{ 'feedback.sort_oldest' | t }}
+              </option>
+              <option value="rating_desc">
+                {{ 'feedback.sort_highest' | t }}
+              </option>
+              <option value="rating_asc">
+                {{ 'feedback.sort_lowest' | t }}
+              </option>
+              <option value="is_automatic_asc">
+                {{ 'feedback.sort_non_automatic' | t }}
+              </option>
+            </select>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+    {% set visibleFeedbacks = [] %}
+    {% for feedback in data.slice(0, (properties.amount if properties.amount else data|length)) %}
+      {% if not properties.hide_automatic_feedbacks or not feedback.is_automatic %}{% set _ = visibleFeedbacks.push(feedback) %}{% endif %}
+    {% endfor %}
+
+    {# Opt-in dual rail for storefront pages; the reviews page, paginated
+       lists and tiny review pools keep the grid. #}
+    {% set feedbacksMarquee = properties.layout != 'grid' and templateName != 'feedback' and not feedbacks_paginator and visibleFeedbacks | length >= 4 %}
+    {% set feedbacksHalf = (visibleFeedbacks | length / 2) | round(0, 'ceil') %}
+    {% set feedbacksRowA = visibleFeedbacks.slice(0, feedbacksHalf) %}
+    {% set feedbacksRowB = visibleFeedbacks.slice(feedbacksHalf) | reverse %}
+
+    {% if visibleFeedbacks | length > 0 %}
+      {% if feedbacksMarquee %}
+        <div class="reviews-marquee" style="--reviews-marquee-speed: {{ properties.marquee_speed if properties.marquee_speed else 44 }}s">
+          <div class="marquee marquee-mask reviews-marquee-row" aria-label="Customer reviews">
+            <div class="marquee-track reviews-marquee-track">
+              <div class="reviews-marquee-group">
+                {% for feedback in feedbacksRowA %}{% render_snippet "feedback-card.njk", feedback=feedback %}{% endfor %}
+              </div>
+              <div class="reviews-marquee-group" aria-hidden="true">
+                {% for feedback in feedbacksRowA %}{% render_snippet "feedback-card.njk", feedback=feedback %}{% endfor %}
+              </div>
+            </div>
+          </div>
+          <div class="marquee marquee-mask reviews-marquee-row reviews-marquee-row--reverse" aria-label="More customer reviews">
+            <div class="marquee-track reviews-marquee-track reviews-marquee-track--reverse">
+              <div class="reviews-marquee-group">
+                {% for feedback in feedbacksRowB %}{% render_snippet "feedback-card.njk", feedback=feedback %}{% endfor %}
+              </div>
+              <div class="reviews-marquee-group" aria-hidden="true">
+                {% for feedback in feedbacksRowB %}{% render_snippet "feedback-card.njk", feedback=feedback %}{% endfor %}
+              </div>
+            </div>
+          </div>
+        </div>
+      {% else %}
+        <div class="w-full grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+          {% for feedback in visibleFeedbacks %}
+            {% render_snippet "feedback-card.njk", feedback=feedback %}
+          {% endfor %}
+        </div>
+      {% endif %}
+      {% if feedbacks_paginator %}
+        {% if feedbacks_paginator.last_page > 1 %}
+          {% render_snippet "pagination.njk", paginator=feedbacks_paginator %}
+        {% endif %}
+      {% elif data|length >= properties.amount %}
+        <div class="flex justify-center mt-8">
+          <a href="{{ '/feedback' | shopUrl }}" class="btn btn-ghost">
+            {{ 'feedback.view_all' | t }}
+            <svg xmlns="http://www.w3.org/2000/svg" class="size-4" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+      {% endif %}
+    {% else %}
+      <div class="empty-state">
+        <svg xmlns="http://www.w3.org/2000/svg" class="size-8 opacity-40" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"/><line x1="8" x2="16" y1="12" y2="12"/></svg>
+        <p>
+          {% if templateName == 'product' %}
+            {{ 'feedback.none_for_product' | t }}
+          {% else %}
+            {{ 'feedback.none' | t }}
+          {% endif %}
+        </p>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+{% if templateName == 'feedback' %}
+  <script>
+    document.addEventListener('alpine:init', () => {
+      document.querySelectorAll('.order-select').forEach((element) => {
+        const choices = new Choices(element, { shouldSort: false });
+
+        choices.passedElement.element.addEventListener('change', (event) => {
+          const orderParts = event.detail.value.split('_');
+          const orderDirection = orderParts.pop();
+          const orderColumn = orderParts.join('_');
+
+          const url = new URL(window.location.href);
+          url.searchParams.set('orderColumn', orderColumn);
+          url.searchParams.set('orderDirection', orderDirection);
+          window.location.href = url.toString();
+        });
+
+        choices.setChoiceByValue('{{ orderColumn }}_{{ orderDirection }}');
+
+        // Workaround to fix default value highlight issue
+        const selectedChoiceElement = choices.choiceList.element.querySelector('.is-selected');
+        if (selectedChoiceElement) {
+          choices._highlightChoice(selectedChoiceElement);
+        }
+      });
+    });
+  </script>
+{% endif %}

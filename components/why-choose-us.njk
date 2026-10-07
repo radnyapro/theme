@@ -1,0 +1,80 @@
+<section id="{{ componentId }}" class="component v6-why" data-component-id="{{ componentId }}" x-data="{ activeFeature: 0, menuOptions: [true, true, false] }">
+  <div class="v6-why__heading">
+    {% if properties.eyebrow %}<span class="v6-eyebrow"><i></i>{{ properties.eyebrow | renderString }}</span>{% endif %}
+    {% if properties.title %}<h2>{{ properties.title | renderString }}</h2>{% endif %}
+    {% if properties.subtitle %}<p>{{ properties.subtitle | renderString }}</p>{% endif %}
+  </div>
+
+  <div class="v6-why__layout">
+    <div class="v6-why__tabs" role="tablist" aria-label="Why choose us">
+      <button type="button" class="v6-why__tab" :class="{ 'is-active': activeFeature === 0 }" @click="activeFeature = 0" :aria-selected="activeFeature === 0" role="tab">
+        <span class="v6-why__tab-icon"><i class="fa-solid fa-bolt" aria-hidden="true"></i></span>
+        <span><strong>{{ properties.card1_title | renderString }}</strong><small>{{ properties.card1_text | renderString }}</small></span>
+        <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+      </button>
+      <button type="button" class="v6-why__tab" :class="{ 'is-active': activeFeature === 1 }" @click="activeFeature = 1" :aria-selected="activeFeature === 1" role="tab">
+        <span class="v6-why__tab-icon"><i class="fa-solid fa-receipt" aria-hidden="true"></i></span>
+        <span><strong>{{ properties.card2_title | renderString }}</strong><small>{{ properties.card2_text | renderString }}</small></span>
+        <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+      </button>
+      <button type="button" class="v6-why__tab" :class="{ 'is-active': activeFeature === 2 }" @click="activeFeature = 2" :aria-selected="activeFeature === 2" role="tab">
+        <span class="v6-why__tab-icon"><i class="fa-solid fa-gauge-high" aria-hidden="true"></i></span>
+        <span><strong>{{ properties.card3_title | renderString }}</strong><small>{{ properties.card3_text | renderString }}</small></span>
+        <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+      </button>
+      <button type="button" class="v6-why__tab" :class="{ 'is-active': activeFeature === 3 }" @click="activeFeature = 3" :aria-selected="activeFeature === 3" role="tab">
+        <span class="v6-why__tab-icon"><i class="fa-solid fa-sliders" aria-hidden="true"></i></span>
+        <span><strong>{{ properties.card4_title | renderString }}</strong><small>{{ properties.card4_text | renderString }}</small></span>
+        <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+      </button>
+      <button type="button" class="v6-why__tab" :class="{ 'is-active': activeFeature === 4 }" @click="activeFeature = 4" :aria-selected="activeFeature === 4" role="tab">
+        <span class="v6-why__tab-icon"><i class="fa-solid fa-credit-card" aria-hidden="true"></i></span>
+        <span><strong>{{ properties.card6_title | renderString }}</strong><small>{{ properties.card6_text | renderString }}</small></span>
+        <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+      </button>
+    </div>
+
+    <div class="v6-why__stage">
+      <article x-show="activeFeature === 0" x-cloak x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" class="v6-why__demo" role="tabpanel">
+        <div class="v6-why__demo-topline"><span><i class="fa-solid fa-bolt" aria-hidden="true"></i> {{ properties.card1_title | renderString }}</span><i class="fa-solid fa-ellipsis" aria-hidden="true"></i></div>
+        <div class="v6-order-journey" aria-label="Order received, invoice processing, payment confirmed, delivery completed">
+          <div class="v6-order-journey__track" aria-hidden="true"><i></i></div>
+          <div class="v6-order-journey__step v6-order-journey__step--1"><span class="v6-order-journey__point"><i class="fa-solid fa-bag-shopping"></i><b class="fa-solid fa-check"></b></span><strong>Order received</strong><small>Order captured</small></div>
+          {% for step in properties.card1_steps %}
+            <div class="v6-order-journey__step v6-order-journey__step--{{ loop.index + 1 }}"><span class="v6-order-journey__point"><i class="{{ step.icon }}"></i><b class="fa-solid fa-check"></b></span><strong>{{ step.label | renderString }}</strong><small>{{ step.status | renderString }}</small></div>
+          {% endfor %}
+        </div>
+        <div class="v6-order-journey__reassurance"><i class="fa-solid fa-bolt" aria-hidden="true"></i> Delivered instantly after payment confirmation.</div>
+        <p class="v6-why__demo-copy">{{ properties.card1_text | renderString }}</p>
+      </article>
+
+      <article x-show="activeFeature === 1" x-cloak x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" class="v6-why__demo" role="tabpanel">
+        <div class="v6-why__demo-topline"><span><i class="fa-solid fa-receipt" aria-hidden="true"></i> {{ properties.card2_title | renderString }}</span><i class="fa-solid fa-ellipsis" aria-hidden="true"></i></div>
+        <div class="v6-demo-checkout"><div><span>Product</span><strong>Digital access</strong><b>$24.99</b></div><div><span>Service fee</span><strong>Included</strong><b>$0.00</b></div><div class="v6-demo-checkout__total"><span>Total today</span><strong>$24.99</strong></div><p><i class="fa-solid fa-check"></i> Pay what you see.</p></div>
+        <p class="v6-why__demo-copy">{{ properties.card2_text | renderString }}</p>
+      </article>
+
+      <article x-show="activeFeature === 2" x-cloak x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" class="v6-why__demo" role="tabpanel">
+        <div class="v6-why__demo-topline"><span><i class="fa-solid fa-gauge-high" aria-hidden="true"></i> {{ properties.card3_title | renderString }}</span><i class="fa-solid fa-ellipsis" aria-hidden="true"></i></div>
+        <div class="v6-demo-dashboard"><div class="v6-demo-dashboard__nav"><i class="fa-solid fa-grid-2"></i><i class="fa-solid fa-box"></i><i class="fa-solid fa-ticket"></i><i class="fa-solid fa-wallet"></i></div><div class="v6-demo-dashboard__content"><span>Customer dashboard</span><strong>Everything in one place.</strong><div><i></i><i></i><i></i></div></div></div>
+        <p class="v6-why__demo-copy">{{ properties.card3_text | renderString }}</p>
+      </article>
+
+      <article x-show="activeFeature === 3" x-cloak x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" class="v6-why__demo" role="tabpanel">
+        <div class="v6-why__demo-topline"><span><i class="fa-solid fa-sliders" aria-hidden="true"></i> {{ properties.card4_title | renderString }}</span><i class="fa-solid fa-ellipsis" aria-hidden="true"></i></div>
+        <div class="v6-demo-menu"><div class="v6-demo-menu__title"><span><i class="fa-solid fa-sliders"></i> Store menu</span><small>Live preview</small></div>
+          {% for option in properties.card4_options %}
+            {% if loop.index <= 3 %}<button type="button" @click="menuOptions[{{ loop.index0 }}] = !menuOptions[{{ loop.index0 }}]" :class="{ 'is-on': menuOptions[{{ loop.index0 }}] }"><span>{{ option.label | renderString }}</span><i></i></button>{% endif %}
+          {% endfor %}
+        </div>
+        <p class="v6-why__demo-copy">{{ properties.card4_text | renderString }}</p>
+      </article>
+
+      <article x-show="activeFeature === 4" x-cloak x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" class="v6-why__demo" role="tabpanel">
+        <div class="v6-why__demo-topline"><span><i class="fa-solid fa-credit-card" aria-hidden="true"></i> {{ properties.card6_title | renderString }}</span><i class="fa-solid fa-ellipsis" aria-hidden="true"></i></div>
+        <div class="v6-demo-payments" aria-label="Configured payment methods"><div class="v6-demo-payments__head"><span><i class="fa-solid fa-file-invoice-dollar" aria-hidden="true"></i> Configured payment methods</span><small><i class="fa-solid fa-lock" aria-hidden="true"></i> Secure checkout</small></div><div class="v6-demo-payments__methods">{% for method in properties.card6_items %}<span class="v6-demo-payments__method" title="{{ method.label }}"><i class="{{ method.icon }}" aria-hidden="true"></i><small>{{ method.label }}</small><b><i class="fa-solid fa-check" aria-hidden="true"></i></b></span>{% endfor %}</div><div class="v6-demo-payments__foot"><span><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Options ready at checkout</span><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></div></div>
+        <p class="v6-why__demo-copy">{{ properties.card6_text | renderString }}</p>
+      </article>
+    </div>
+  </div>
+</section>

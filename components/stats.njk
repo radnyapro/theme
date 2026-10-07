@@ -1,0 +1,28 @@
+<section id="{{ componentId }}" class="component section-tight" data-component-id="{{ componentId }}">
+  <div class="wrap">
+    <div class="gcard gcard-glow px-6 py-8 md:px-10 md:py-10">
+      <div class="grid grid-cols-2 gap-6 md:grid-cols-4 md:gap-8">
+        <div class="text-center">
+          <p class="tgrad font-display text-3xl font-bold tracking-tight md:text-4xl">{{ helpers.numbers.formatCompact(shop.products_sold) }}{% if shop.products_sold < 1000 %}+{% endif %}</p>
+          <p class="stat-label mt-1.5">{{ 'stats.orders' | t }}</p>
+        </div>
+        <div class="text-center">
+          <p class="tgrad font-display text-3xl font-bold tracking-tight md:text-4xl">{{ helpers.numbers.formatCompact(shop.total_customers) }}{% if shop.total_customers < 1000 %}+{% endif %}</p>
+          <p class="stat-label mt-1.5">{{ 'stats.customers' | t }}</p>
+        </div>
+        {% if shop.average_rating %}
+          <div class="text-center">
+            <p class="tgrad font-display text-3xl font-bold tracking-tight md:text-4xl">{{ helpers.numbers.formatDecimal(shop.average_rating) }}</p>
+            <p class="stat-label mt-1.5">{{ 'stats.rating' | t }}</p>
+          </div>
+        {% endif %}
+        {% if shop.total_feedbacks %}
+          <div class="text-center">
+            <p class="tgrad font-display text-3xl font-bold tracking-tight md:text-4xl">{{ helpers.numbers.formatCompact(shop.total_feedbacks) }}</p>
+            <p class="stat-label mt-1.5">{{ 'stats.reviews' | t }}</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>

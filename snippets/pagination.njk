@@ -1,0 +1,71 @@
+<div class="mt-10">
+  <nav role="navigation" aria-label="{{ 'pagination.nav_label' | t }}" class="flex items-center justify-between">
+    <div class="flex justify-between flex-1 sm:hidden">
+      {% if paginator.prev_page_url %}
+        <a href="{{ paginator.prev_page_url }}" class="btn btn-soft btn-sm">
+          « {{ 'pagination.previous' | t }}
+        </a>
+      {% else %}
+        <span class="btn btn-soft btn-sm opacity-50 pointer-events-none">« {{ 'pagination.previous' | t }}</span>
+      {% endif %}
+      {% if paginator.next_page_url %}
+        <a href="{{ paginator.next_page_url }}" class="btn btn-soft btn-sm">
+          {{ 'pagination.next' | t }} »
+        </a>
+      {% else %}
+        <span class="btn btn-soft btn-sm opacity-50 pointer-events-none">{{ 'pagination.next' | t }} »</span>
+      {% endif %}
+    </div>
+
+    <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+      <div>
+        <p class="text-sm text-muted">
+          {{ 'pagination.showing' | t({ from: paginator.from, to: paginator.to, total: paginator.total }) | safe }}
+        </p>
+      </div>
+      <div class="flex items-center gap-1.5">
+        {% if paginator.prev_page_url %}
+          <a href="{{ paginator.prev_page_url }}" class="icon-btn !size-9" aria-label="« Previous">
+            <svg class="size-4" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+          </a>
+        {% else %}
+          <span class="icon-btn !size-9 opacity-40 pointer-events-none">
+            <svg class="size-4" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+          </span>
+        {% endif %}
+
+        {% for link in paginator.links %}
+          {% if link.label != '&laquo; Previous' and link.label != 'Next &raquo;' %}
+            {% if link.url %}
+              {% if link.active %}
+                <span aria-current="page" class="filter-pill active pointer-events-none">{{ link.label }}</span>
+              {% else %}
+                <a href="{{ link.url }}" class="filter-pill" aria-label="{{ 'pagination.go_to_page' | t({ page: link.label }) }}">
+                  {{ link.label }}
+                </a>
+              {% endif %}
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+
+        {% if paginator.next_page_url %}
+          <a href="{{ paginator.next_page_url }}" rel="next" class="icon-btn !size-9" aria-label="{{ 'pagination.next' | t }}">
+            <svg class="size-4" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+            </svg>
+          </a>
+        {% else %}
+          <span class="icon-btn !size-9 opacity-40 pointer-events-none">
+            <svg class="size-4" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+            </svg>
+          </span>
+        {% endif %}
+      </div>
+    </div>
+  </nav>
+</div>

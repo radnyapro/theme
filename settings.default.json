@@ -1,0 +1,511 @@
+{
+  "templates": {
+    "shop": {
+      "layout": "master",
+      "components": {
+        "hero": {
+          "type": "hero",
+          "properties": {
+            "eyebrow": "Instant delivery · automated checkout",
+            "title": "delivered instantly.",
+            "title_accent": "Digital products,",
+            "subtitle": "Keys, accounts and more delivered automatically after checkout. Pay the way you want and get your order in seconds.",
+            "button_text": "Browse products",
+            "button_link": "/products",
+            "secondary_button_text": "Reviews",
+            "secondary_button_link": "/feedback",
+            "show_stats": true,
+            "show_mock": true,
+            "mock_title": null,
+            "mock_key_label": "Order #4821",
+            "mock_key": "KEY-••••-••••-••••",
+            "secondary_button_icon": "fas fa-star",
+            "show_payment_rail": true,
+            "rail_label": "Checkout · methods shown at payment",
+            "mock_badge": "Online",
+            "mock_bar_label": "Instant delivery",
+            "mock_animate": true,
+            "mock_duration": 3200
+          }
+        },
+        "products": {
+          "type": "products",
+          "properties": {
+            "eyebrow": "Catalog",
+            "title": "Featured",
+            "title_accent": "products",
+            "subtitle": null,
+            "center_head": false,
+            "ids": [],
+            "show_searchbar": true,
+            "centered": false
+          }
+        },
+        "bento-1": {
+          "type": "bento",
+          "properties": {
+            "eyebrow": "How it works",
+            "title": "From cart to",
+            "title_accent": "key in seconds.",
+            "subtitle": "Three steps, zero waiting.",
+            "center_head": false,
+            "items": [
+              {
+                "icon": "fas fa-cart-shopping",
+                "stat": null,
+                "title": "1. Add to cart",
+                "description": "Pick a product and any options — no account required.",
+                "link": null,
+                "link_text": null,
+                "wide": false
+              },
+              {
+                "icon": "fas fa-credit-card",
+                "stat": null,
+                "title": "2. Pay your way",
+                "description": "Cards, crypto and more — choose what suits you at checkout.",
+                "link": null,
+                "link_text": null,
+                "wide": false
+              },
+              {
+                "icon": "fas fa-key",
+                "stat": null,
+                "title": "3. Get your order",
+                "description": "Your keys or access appear instantly — on screen and in your email.",
+                "link": null,
+                "link_text": null,
+                "wide": true
+              }
+            ],
+            "animate_progress": true,
+            "animation_speed": 3200
+          }
+        },
+        "stats": {
+          "type": "stats",
+          "properties": {}
+        },
+        "feedbacks": {
+          "type": "feedbacks",
+          "properties": {
+            "eyebrow": "Reviews",
+            "title": "Loved by",
+            "title_accent": "customers.",
+            "subtitle": null,
+            "center_head": false,
+            "amount": 6,
+            "hide_automatic_feedbacks": false,
+            "layout": "marquee",
+            "marquee_speed": 44
+          }
+        },
+        "faq-1": {
+          "type": "faq",
+          "properties": {
+            "eyebrow": "FAQ",
+            "title": "Frequently asked",
+            "title_accent": "questions.",
+            "subtitle": "Everything you need to know before ordering.",
+            "center_head": true,
+            "items": [
+              {
+                "question": "How fast is delivery?",
+                "answer": "Delivery is automatic — most orders arrive within seconds of a completed payment."
+              },
+              {
+                "question": "Which payment methods are accepted?",
+                "answer": "All enabled payment methods are shown at checkout."
+              },
+              {
+                "question": "How do I find my order again?",
+                "answer": "Click Find order in the top navigation and sign in with your order email — your orders and keys are listed there."
+              }
+            ]
+          }
+        },
+        "cta": {
+          "type": "cta",
+          "properties": {
+            "eyebrow": "Ready when you are",
+            "title": "Get started",
+            "title_accent": "in seconds.",
+            "subtitle": "Browse the catalog and check out with your favorite payment method.",
+            "button_text": "Shop now",
+            "button_link": "/products"
+          }
+        }
+      },
+      "components_order": [
+        "hero",
+        "products",
+        "bento-1",
+        "stats",
+        "feedbacks",
+        "faq-1",
+        "cta"
+      ]
+    },
+    "cart": {
+      "layout": "master",
+      "components": {
+        "cart-page": {
+          "type": "cart-page",
+          "properties": {}
+        }
+      },
+      "components_order": [
+        "cart-page"
+      ]
+    },
+    "products": {
+      "layout": "master",
+      "components": {
+        "products-page": {
+          "type": "products-page",
+          "properties": {
+            "default_title": "All products",
+            "category_title": "{{ category.name }}"
+          }
+        }
+      },
+      "components_order": [
+        "products-page"
+      ]
+    },
+    "product": {
+      "layout": "master",
+      "components": {
+        "product-page": {
+          "type": "product-page",
+          "properties": {
+            "variant_selector": "buttons",
+            "show_feedbacks": true,
+            "hide_add_to_cart": false,
+            "hide_buy_now": false,
+            "hide_instant_balance_buy": false
+          }
+        }
+      },
+      "components_order": [
+        "product-page"
+      ]
+    },
+    "feedback": {
+      "layout": "master",
+      "components": {
+        "feedbacks": {
+          "type": "feedbacks",
+          "properties": {
+            "eyebrow": "Reviews",
+            "title": "What customers",
+            "title_accent": "say.",
+            "subtitle": "Real feedback from verified orders.",
+            "center_head": true,
+            "amount": null,
+            "hide_automatic_feedbacks": false,
+            "layout": "marquee",
+            "marquee_speed": 44
+          }
+        }
+      },
+      "components_order": [
+        "feedbacks"
+      ]
+    },
+    "status": {
+      "layout": "master",
+      "components": {
+        "status-page": {
+          "type": "status-page",
+          "properties": {
+            "title": null
+          }
+        }
+      },
+      "components_order": [
+        "status-page"
+      ]
+    },
+    "faq": {
+      "layout": "master",
+      "components": {
+        "faq": {
+          "type": "faq",
+          "properties": {
+            "eyebrow": "FAQ",
+            "title": "Frequently asked",
+            "title_accent": "questions.",
+            "subtitle": "Everything you need to know before ordering.",
+            "center_head": true,
+            "items": [
+              {
+                "question": "How fast is delivery?",
+                "answer": "Delivery is automatic — most orders arrive within seconds of a completed payment."
+              },
+              {
+                "question": "Which payment methods are accepted?",
+                "answer": "All enabled payment methods are shown at checkout."
+              },
+              {
+                "question": "How do I find my order again?",
+                "answer": "Click Find order in the top navigation and sign in with your order email — your orders and keys are listed there."
+              }
+            ]
+          }
+        }
+      },
+      "components_order": [
+        "faq"
+      ]
+    },
+    "terms": {
+      "layout": "master",
+      "components": {
+        "terms-page": {
+          "type": "terms-page",
+          "properties": {
+            "title": "Terms of Service"
+          }
+        }
+      },
+      "components_order": [
+        "terms-page"
+      ]
+    },
+    "privacy-policy": {
+      "layout": "master",
+      "components": {
+        "privacy-policy-page": {
+          "type": "privacy-policy-page",
+          "properties": {
+            "title": "Privacy Policy"
+          }
+        }
+      },
+      "components_order": [
+        "privacy-policy-page"
+      ]
+    },
+    "refund-policy": {
+      "layout": "master",
+      "components": {
+        "refund-policy-page": {
+          "type": "refund-policy-page",
+          "properties": {
+            "title": "Refund Policy"
+          }
+        }
+      },
+      "components_order": [
+        "refund-policy-page"
+      ]
+    },
+    "blog": {
+      "layout": "master",
+      "components": {
+        "blog-posts": {
+          "type": "blog-posts",
+          "properties": {
+            "title": "From the blog",
+            "amount": null,
+            "centered": true
+          }
+        }
+      },
+      "components_order": [
+        "blog-posts"
+      ]
+    },
+    "blog-post": {
+      "layout": "master",
+      "components": {
+        "blog-post-page": {
+          "type": "blog-post-page",
+          "properties": {
+            "show_featured_products": true
+          }
+        }
+      },
+      "components_order": [
+        "blog-post-page"
+      ]
+    },
+    "customer-dashboard": {
+      "layout": "master",
+      "components": {},
+      "components_order": []
+    },
+    "customer-invoices": {
+      "layout": "master",
+      "components": {},
+      "components_order": []
+    },
+    "customer-subscriptions": {
+      "layout": "master",
+      "components": {},
+      "components_order": []
+    },
+    "customer-tickets": {
+      "layout": "master",
+      "components": {},
+      "components_order": []
+    },
+    "customer-ticket": {
+      "layout": "master",
+      "components": {},
+      "components_order": []
+    },
+    "customer-balance": {
+      "layout": "master",
+      "components": {},
+      "components_order": []
+    },
+    "customer-affiliate": {
+      "layout": "master",
+      "components": {},
+      "components_order": []
+    },
+    "customer-reseller": {
+      "layout": "master",
+      "components": {},
+      "components_order": []
+    },
+    "maintenance": {
+      "layout": "master",
+      "components": {},
+      "components_order": []
+    }
+  },
+  "global": {
+    "properties": {
+      "accent_color": "#ff6ba8",
+      "accent_color_2": "#d16bff",
+      "border_color": "#ff8fc7",
+      "background_color": "#0a0410",
+      "card_color": "#1c1028",
+      "text_primary_color": "#ffffff",
+      "text_accent_color": "#ffffff",
+      "font": "Inter",
+      "display_font": "Space Grotesk",
+      "mono_font": "JetBrains Mono",
+      "card_radius": 20,
+      "input_radius": 12,
+      "button_radius": 12,
+      "control_height": 44,
+      "container_width": 1200,
+      "show_ambient_particles": true,
+      "status_positive_color": "#00d294",
+      "status_warning_color": "#fcbb00",
+      "status_error_color": "#ff6568",
+      "snow": false,
+      "snow_color": "#ffffff",
+      "product_card_image_aspect_ratio": "16/9",
+      "product_page_image_aspect_ratio": "16/9",
+      "product_image_fit": "cover",
+      "group_card_image_aspect_ratio": "16/9",
+      "group_image_fit": "cover",
+      "blog_card_image_aspect_ratio": "16/9",
+      "blog_image_fit": "cover"
+    },
+    "components": {
+      "announcement": {
+        "announcements": []
+      },
+      "header": {
+        "show_shop_name": true,
+        "show_logo": true,
+        "cta_text": "Find order",
+        "links": [
+          {
+            "text": "Products",
+            "link": "/products"
+          },
+          {
+            "text": "Reviews",
+            "link": "/feedback"
+          },
+          {
+            "text": "Status",
+            "link": "/status"
+          },
+          {
+            "text": "FAQ",
+            "link": "/faq"
+          },
+          {
+            "text": "Blog",
+            "link": "/blog"
+          }
+        ],
+        "hide_currency_selector": false,
+        "hide_language_selector": false,
+        "hide_customer_dashboard": false,
+        "hide_cart": false
+      },
+      "footer": {
+        "show_shop_name": true,
+        "show_logo": true,
+        "description": null,
+        "show_stats": true,
+        "show_socials": true,
+        "column_1_title": "Navigation",
+        "column_1_links": [
+          {
+            "text": "Home",
+            "link": "/"
+          },
+          {
+            "text": "Products",
+            "link": "/products"
+          },
+          {
+            "text": "Reviews",
+            "link": "/feedback"
+          },
+          {
+            "text": "Status",
+            "link": "/status"
+          },
+          {
+            "text": "FAQ",
+            "link": "/faq"
+          }
+        ],
+        "column_2_title": "More",
+        "column_2_links": [
+          {
+            "text": "Find your order",
+            "link": "/customer/invoices"
+          },
+          {
+            "text": "Blog",
+            "link": "/blog"
+          },
+          {
+            "text": "Cart",
+            "link": "/cart"
+          }
+        ],
+        "copyright": "Copyright © {{ shop.name }} {{ '' | currentYear }}",
+        "links": [
+          {
+            "text": "Terms of Service",
+            "link": "/terms-of-service",
+            "new_tab": false
+          },
+          {
+            "text": "Privacy Policy",
+            "link": "/privacy-policy",
+            "new_tab": false
+          },
+          {
+            "text": "Refund Policy",
+            "link": "/refund-policy",
+            "new_tab": false
+          }
+        ]
+      }
+    }
+  }
+}

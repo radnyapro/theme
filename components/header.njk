@@ -1,0 +1,169 @@
+<header class="site-nav component {{ 'navbar' if isBuilder }}" data-component-id="header" x-data="{ drawerOpen: false }" x-effect="document.body.style.overflow = drawerOpen ? 'hidden' : ''">
+  <div class="wrap !max-w-none !px-4 md:!px-6">
+    <div class="nav-shell">
+      <div class="site-nav-inner">
+      {# ---- Brand ---- #}
+      <a href="{{ '/' | shopUrl }}" class="flex items-center gap-3 min-w-0 shrink-0">
+        {% if global.components.header.show_logo and shop.image_url %}
+          <img src="{{ shop.image_url }}" alt="{{ shop.name }}" class="h-9 w-9 rounded-xl object-cover ring-1 ring-white/10" />
+        {% endif %}
+        {% if global.components.header.show_shop_name %}
+          <span class="font-display text-[1.05rem] font-bold tracking-tight text-t-primary truncate">{{ shop.name }}</span>
+        {% endif %}
+      </a>
+
+      {# ---- Center links ---- #}
+      <nav class="nav-links" aria-label="{{ 'header.navigation' | t }}">
+        {% for link in global.components.header.links %}
+          {% set lActive = false %}
+          {% if (link.link == '/' and templateName == 'shop') or (link.link == '/cart' and templateName == 'cart') or (link.link == '/products' and templateName == 'products') or (link.link == '/terms-of-service' and templateName == 'terms') or (link.link == '/privacy-policy' and templateName == 'privacy-policy') or (link.link == '/refund-policy' and templateName == 'refund-policy') or (link.link == '/feedback' and templateName == 'feedback') or (link.link == '/status' and templateName == 'status') or (link.link == '/faq' and templateName == 'faq') or (link.link == '/blog' and templateName == 'blog') %}
+            {% set lActive = true %}
+          {% endif %}
+          <a href="{{ link.link | shopUrl }}" target="{{ '_blank' if link.new_tab }}" class="nav-link {{ 'active' if lActive }}">
+            {{ link.text }}
+          </a>
+        {% endfor %}
+      </nav>
+
+      {# ---- Actions ---- #}
+      <div class="nav-actions">
+        {% if not global.components.header.hide_currency_selector %}
+          {% if currency_rates_usd | length > 1 %}
+            <div class="currency-selector hidden md:block">
+              <select class="bg-card border border-white/5 rounded-lg text-transparent font-semibold" style="width: 80px; height: 38px;">
+                {% for code, rate in currency_rates_usd %}
+                  <option value="{{ code }}">
+                    <span class="flex items-center justify-between">
+                      <span>
+                        <span class="inline-block w-10 bg-white/5 rounded text-t-primary text-center px-1 py-px mr-1 symbol">{{ currency_symbols[code] }}</span>
+                        <span class="text-t-primary code">{{ code.toUpperCase() }}</span>
+                      </span>
+                      {% if code.toUpperCase() == currency %}
+                        <span class="text-t-primary/75 text-xs default">{{ 'common.default' | t }}</span>
+                      {% endif %}
+                    </span>
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+          {% endif %}
+        {% endif %}
+
+        {% if not global.components.header.hide_language_selector %}
+          <div class="hidden md:block">{% render_snippet "language-selector.njk" %}</div>
+        {% endif %}
+
+        {% if not global.components.header.hide_customer_dashboard %}
+          {% if shop_customer %}
+            <a href="{{ '/customer/dashboard' | shopUrl }}" class="btn btn-ghost btn-sm !hidden md:!inline-flex">
+              <svg xmlns="http://www.w3.org/2000/svg" class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              {{ 'header.my_account' | t }}
+            </a>
+          {% else %}
+            <button type="button" @click="appCustomer.loginOrRedirect()" class="btn btn-ghost btn-sm !hidden md:!inline-flex">
+              {{ 'login.submit' | t }}
+            </button>
+          {% endif %}
+        {% endif %}
+
+        {% if not global.components.header.hide_cart %}
+          <a href="{{ '/cart' | shopUrl }}" class="icon-btn" aria-label="{{ 'header.cart' | t }}">
+            <svg xmlns="http://www.w3.org/2000/svg" class="size-5" fill="currentColor" viewBox="0 0 256 256"><path d="M230.14,58.87A8,8,0,0,0,224,56H62.68L56.6,22.57A8,8,0,0,0,48.73,16H24a8,8,0,0,0,0,16h18L67.56,172.29a24,24,0,0,0,5.33,11.27,28,28,0,1,0,44.4,8.44h45.42A27.75,27.75,0,0,0,160,204a28,28,0,1,0,28-28H91.17a8,8,0,0,1-7.87-6.57L80.13,152h116a24,24,0,0,0,23.61-19.71l12.16-66.86A8,8,0,0,0,230.14,58.87ZM104,204a12,12,0,1,1-12-12A12,12,0,0,1,104,204Zm96,0a12,12,0,1,1-12-12A12,12,0,0,1,200,204Zm4-74.57A8,8,0,0,1,196.1,136H77.22L65.59,72H214.41Z"></path></svg>
+            <template x-if="appCart.countWithQuantities > 0">
+              <span class="badge"><span x-text="appCart.countWithQuantities > 9 ? '9+' : appCart.countWithQuantities"></span></span>
+            </template>
+          </a>
+        {% endif %}
+
+        {% if not global.components.header.hide_customer_dashboard %}
+          <button type="button" @click="appCustomer.loginOrRedirect()" class="btn btn-bloom btn-sm !hidden md:!inline-flex">
+            <svg xmlns="http://www.w3.org/2000/svg" class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            {{ global.components.header.cta_text if global.components.header.cta_text else 'Find order' }}
+          </button>
+        {% endif %}
+
+        {# Mobile: hamburger #}
+        <button type="button" class="icon-btn nav-burger" @click="drawerOpen = true" aria-label="{{ 'header.menu' | t }}" :aria-expanded="drawerOpen">
+          <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" x2="20" y1="7" y2="7"/><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="17" y2="17"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  {# ---- Mobile drawer ---- #}
+  <div class="mobile-drawer" x-show="drawerOpen" x-cloak
+    x-transition:enter="transition ease-out duration-300"
+    x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+    x-transition:leave="transition ease-in duration-200"
+    x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+    @keydown.escape.window="drawerOpen = false"
+    role="dialog" aria-modal="true" aria-label="{{ 'header.menu' | t }}">
+    <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" @click="drawerOpen = false" aria-hidden="true"></div>
+    <div class="mobile-drawer-panel"
+      x-transition:enter="transition ease-out duration-300 transform"
+      x-transition:enter-start="translate-y-8 opacity-0" x-transition:enter-end="translate-y-0 opacity-100"
+      x-transition:leave="transition ease-in duration-200 transform"
+      x-transition:leave-start="translate-y-0 opacity-100" x-transition:leave-end="translate-y-8 opacity-0">
+      <div class="flex items-center justify-between mb-4">
+        <span class="font-display text-lg font-bold">{{ 'header.menu' | t }}</span>
+        <button type="button" class="icon-btn" @click="drawerOpen = false" aria-label="{{ 'common.close' | t }}">
+          <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <nav class="flex flex-col" aria-label="{{ 'header.navigation' | t }}">
+        {% for link in global.components.header.links %}
+          {% set lActive = false %}
+          {% if (link.link == '/' and templateName == 'shop') or (link.link == '/cart' and templateName == 'cart') or (link.link == '/products' and templateName == 'products') or (link.link == '/terms-of-service' and templateName == 'terms') or (link.link == '/privacy-policy' and templateName == 'privacy-policy') or (link.link == '/refund-policy' and templateName == 'refund-policy') or (link.link == '/feedback' and templateName == 'feedback') or (link.link == '/status' and templateName == 'status') or (link.link == '/faq' and templateName == 'faq') or (link.link == '/blog' and templateName == 'blog') %}
+            {% set lActive = true %}
+          {% endif %}
+          <a href="{{ link.link | shopUrl }}" target="{{ '_blank' if link.new_tab }}" class="drawer-link {{ 'active' if lActive }}">
+            {{ link.text }}
+            <svg xmlns="http://www.w3.org/2000/svg" class="size-4 opacity-40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+          </a>
+        {% endfor %}
+      </nav>
+
+      <div class="flex items-center gap-3 mt-6 flex-wrap">
+        {% if not global.components.header.hide_currency_selector %}
+          {% if currency_rates_usd | length > 1 %}
+            <div class="currency-selector">
+              <select class="bg-card border border-white/5 rounded-lg text-transparent font-semibold" style="width: 80px; height: 38px;">
+                {% for code, rate in currency_rates_usd %}
+                  <option value="{{ code }}">
+                    <span class="flex items-center justify-between">
+                      <span>
+                        <span class="inline-block w-10 bg-white/5 rounded text-t-primary text-center px-1 py-px mr-1 symbol">{{ currency_symbols[code] }}</span>
+                        <span class="text-t-primary code">{{ code.toUpperCase() }}</span>
+                      </span>
+                      {% if code.toUpperCase() == currency %}
+                        <span class="text-t-primary/75 text-xs default">{{ 'common.default' | t }}</span>
+                      {% endif %}
+                    </span>
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+          {% endif %}
+        {% endif %}
+        {% if not global.components.header.hide_language_selector %}
+          {% render_snippet "language-selector.njk" %}
+        {% endif %}
+      </div>
+
+      {% if not global.components.header.hide_customer_dashboard %}
+        <div class="mt-6 flex flex-col gap-3">
+          {% if shop_customer %}
+            <a href="{{ '/customer/dashboard' | shopUrl }}" class="btn btn-bloom btn-block">{{ 'header.my_account' | t }}</a>
+          {% else %}
+            <button type="button" @click="appCustomer.loginOrRedirect()" class="btn btn-bloom btn-block">
+              {{ global.components.header.cta_text if global.components.header.cta_text else 'Find order' }}
+            </button>
+            <button type="button" @click="appCustomer.loginOrRedirect()" class="btn btn-soft btn-block">{{ 'login.submit' | t }}</button>
+          {% endif %}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</header>

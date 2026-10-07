@@ -1,0 +1,72 @@
+<div
+  x-show="appReseller.apiModalIsOpen"
+  x-cloak
+  class="fixed inset-0 z-50 overflow-y-auto"
+  aria-labelledby="reseller-api-modal-title"
+  role="dialog"
+  aria-modal="true"
+>
+  <div class="flex items-center justify-center min-h-screen px-4 text-center">
+    <div
+      x-show="appReseller.apiModalIsOpen"
+      x-transition:enter="transition ease-out duration-300 transform"
+      x-transition:enter-start="opacity-0"
+      x-transition:enter-end="opacity-100"
+      x-transition:leave="transition ease-in duration-200 transform"
+      x-transition:leave-start="opacity-100"
+      x-transition:leave-end="opacity-0"
+      @click="appReseller.closeApiModal()"
+      class="fixed inset-0 transition-opacity bg-black/75"
+      aria-hidden="true"
+    ></div>
+
+    <div
+      x-show="appReseller.apiModalIsOpen"
+      x-transition:enter="transition ease-out duration-300 transform"
+      x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+      x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+      x-transition:leave="transition ease-in duration-200 transform"
+      x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+      x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+      class="inline-block w-full max-w-lg p-6 my-8 overflow-hidden text-left align-middle transition-all transform border border-white/5 rounded-lg bg-background text-t-primary"
+    >
+      <div class="flex items-start justify-between gap-4 mb-4">
+        <h3 id="reseller-api-modal-title" class="text-xl font-bold truncate">
+          {{ 'reseller.api_key' | t }}
+        </h3>
+
+        <button @click="appReseller.closeApiModal()" class="text-t-primary focus:outline-none hover:text-accent">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-7 text-t-primary/50 hover:text-accent-500">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <p class="text-sm text-t-primary/60">
+        {{ 'reseller.api_hint' | t }}
+      </p>
+
+      <template x-if="appReseller.apiKey">
+        <div class="mt-4">
+          <p class="text-xs text-t-primary/60 uppercase">{{ 'reseller.new_api_key' | t }}</p>
+          <code class="block mt-1 p-2 text-xs text-t-primary bg-white/5 border border-white/5 rounded-lg break-all" x-text="appReseller.apiKey"></code>
+        </div>
+      </template>
+
+      <div class="mt-4">
+        <button
+          type="button"
+          class="px-4 py-2 rounded-lg text-sm font-semibold bg-accent-500 border border-accent-500 text-t-accent transition hover:enabled:bg-accent-500/50 disabled:opacity-50 disabled:pointer-events-none"
+          @click="appReseller.regenerateApiKey()"
+          :disabled="appReseller.apiKeyLoading"
+        >
+          {{ 'Regenerate API Key' if reseller_has_api_key else 'Generate API Key' }}
+        </button>
+      </div>
+      {% if reseller_has_api_key %}
+        <p class="text-xs text-t-primary/60 mt-2">{{ 'reseller.regenerate_warning' | t }}</p>
+      {% endif %}
+      <p class="text-sm text-red-400 mt-2" x-show="appReseller.apiKeyError" x-text="appReseller.apiKeyError"></p>
+    </div>
+  </div>
+</div>

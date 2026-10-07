@@ -1,0 +1,20 @@
+{% for button in buttons %}
+  {% if button.color == 'primary' and button.style == 'regular' %}
+  {% set bClass = 'bg-accent-500 border-accent-500 text-t-accent hover:bg-accent-500/50' %}
+  {% elif button.color == 'primary' and button.style == 'outline' %}
+  {% set bClass = 'bg-white/[0.025] border-accent-500 text-t-primary hover:bg-accent-500/10' %}
+  {% elif button.color == 'secondary' and button.style == 'regular' %}
+  {% set bClass = 'bg-background border-background text-t-primary hover:bg-white/[0.025]0' %}
+  {% elif button.color == 'secondary' and button.style == 'outline' %}
+  {% set bClass = 'bg-white/[0.025] border-white/5 text-t-primary hover:bg-white/5' %}
+  {% endif %}
+  <a
+    href="{{ (button.link | shopUrl) if button.link else '#' }}"
+    target="{{ 'blank' if button.new_tab }}"
+    class="inline-flex items-center gap-4 border px-6 py-2 rounded-lg text-sm font-semibold {{ bClass }} hover:text-t-primary transition-colors duration-300 ease-in-out">
+    {{ button.text | renderString }}
+    {% if button.icon %}
+    <i class="{{ button.icon }} fa-fw"></i>
+    {% endif %}
+  </a>
+{% endfor %}

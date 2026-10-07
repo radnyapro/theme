@@ -1,0 +1,30 @@
+<section id="{{ componentId }}" class="component section" data-component-id="{{ componentId }}">
+  <div class="wrap">
+    <div class="section-head {{ 'center' if properties.center_head }}">
+      <span class="eyebrow {{ 'eyebrow-centered' if properties.center_head }}">{{ properties.eyebrow if properties.eyebrow else 'features.eyebrow' | t }}</span>
+      {% if properties.title %}
+        <h2 class="title">{{ properties.title | renderString }}{% if properties.title_accent %} <span class="tgrad">{{ properties.title_accent | renderString }}</span>{% endif %}</h2>
+      {% endif %}
+      {% if properties.subtitle %}
+        <p class="sub">{{ properties.subtitle | renderString }}</p>
+      {% endif %}
+    </div>
+
+    {% set cols = properties.columns if properties.columns else 3 %}
+    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 {% if cols == 2 %}lg:grid-cols-2{% elif cols == 4 %}lg:grid-cols-3 xl:grid-cols-4{% else %}lg:grid-cols-3{% endif %}">
+      {% for item in properties.items %}
+        <div class="gcard gcard-hover p-6">
+          {% if item.icon %}
+            <div class="size-11 rounded-xl grid place-items-center mb-4" style="background: color-mix(in srgb, rgb(var(--cl-accent)) 12%, transparent); color: rgb(var(--cl-accent)); border: 1px solid color-mix(in srgb, rgb(var(--cl-accent)) 22%, transparent);">
+              <i class="{{ item.icon }} text-lg" aria-hidden="true"></i>
+            </div>
+          {% endif %}
+          <h3 class="text-base font-semibold mb-1.5">{{ item.title | renderString }}</h3>
+          {% if item.description %}
+            <p class="text-sm leading-relaxed text-muted">{{ item.description | renderString }}</p>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>

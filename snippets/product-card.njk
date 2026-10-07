@@ -1,0 +1,100 @@
+{% set product_image_class = ('object-scale-down' if global.properties.product_image_fit == 'scale-down' else 'object-cover') %}
+{% set group_image_class = ('object-scale-down' if global.properties.group_image_fit == 'scale-down' else 'object-cover') %}
+
+<a
+  class="pcard block h-full"
+  href="{{ 'javascript:void(0);' if product.type == 'group' else ( ('/product/' + product.path) | shopUrl ) }}"
+  @click="{{ 'openGroupModal(' ~ product.id ~ ')' if product.type == 'group' else '' }}"
+>
+  <div class="pcard-media">
+    {% if product.image_urls|length > 0 %}
+      <img src="{{ product.image_urls[0] }}" alt="{{ product.name }}" class="{{ 'aspect-group-card-image ' ~ group_image_class if product.type == 'group' else 'aspect-product-card-image ' ~ product_image_class }} w-full object-center" loading="lazy" />
+    {% elif product.image_url %}
+      <img src="{{ product.image_url }}" alt="{{ product.name }}" class="{{ 'aspect-group-card-image ' ~ group_image_class if product.type == 'group' else 'aspect-product-card-image ' ~ product_image_class }} w-full object-center" loading="lazy" />
+    {% else %}
+      <div class="flex justify-center items-center {{ 'aspect-group-card-image' if product.type == 'group' else 'aspect-product-card-image' }}" style="background: color-mix(in srgb, rgb(var(--cl-accent)) 5%, transparent);">
+        <svg xmlns="http://www.w3.org/2000/svg" class="size-16" viewBox="0 0 256 256" style="color: color-mix(in srgb, rgb(var(--cl-accent)) 40%, transparent)">
+          <path fill="currentColor" d="m222.72 67.91l-88-48.18a13.9 13.9 0 0 0-13.44 0l-88 48.18A14 14 0 0 0 26 80.18v95.64a14 14 0 0 0 7.28 12.27l88 48.18a13.92 13.92 0 0 0 13.44 0l88-48.18a14 14 0 0 0 7.28-12.27V80.18a14 14 0 0 0-7.28-12.27ZM127 30.25a2 2 0 0 1 1.92 0L212.51 76l-33.94 18.57l-84.52-46.26ZM122 223l-83-45.43a2 2 0 0 1-1-1.75V86.66l84 46ZM43.49 76l38.07-20.85l84.51 46.26L128 122.24ZM218 175.82a2 2 0 0 1-1 1.75L134 223v-90.36l36-19.71V152a6 6 0 0 0 12 0v-45.63l36-19.71Z" />
+        </svg>
+      </div>
+    {% endif %}
+
+    {% if product.product_badges.card|length > 0 %}
+      <div class="badges">
+        {% for productBadge in product.product_badges.card %}
+          <span class="pill" style="background-color: {{ productBadge.color }}; border-color: transparent; color: #fff;" data-text="{{ productBadge.label }}" data-color="{{ productBadge.color }}">
+            {% if productBadge.icon %}
+              <i class="{{ productBadge.icon }} fa-fw" aria-hidden="true"></i>
+            {% endif %}
+            {{ productBadge.label }}
+          </span>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="pcard-body">
+    <h3 class="pcard-title">{{ product.name }}</h3>
+
+    {% if product.type == 'group' %}
+      <p class="pcard-desc">{{ product.products | length }} {{ 'product' if product.products | length == 1 else 'products.count_label' | t }}</p>
+    {% elif product.description and (properties is not defined or properties.show_description is not defined or properties.show_description) %}
+      <p class="pcard-desc">{{ product.description | striptags | trim | truncate(96) }}</p>
+    {% endif %}
+
+    <div class="pcard-meta">
+      {% if product.type != 'group' %}
+        {% if product.stock === 0 %}
+          <span class="stock-chip stock-out">
+            <span class="dot" style="background: rgb(var(--status-error))"></span>
+            {{ 'product.out_of_stock' | t }}
+          </span>
+        {% elif product.hide_stock_count %}
+          <span class="stock-chip stock-in">
+            <span class="dot" style="background: rgb(var(--status-positive))"></span>
+            {{ 'product.in_stock' | t }}
+          </span>
+        {% elif product.stock === -1 %}
+          <span class="stock-chip stock-in">
+            <span class="dot" style="background: rgb(var(--status-positive))"></span>
+            {{ 'product.in_stock' | t }}
+          </span>
+        {% else %}
+          <span class="stock-chip stock-in">
+            <span class="dot" style="background: rgb(var(--status-positive))"></span>
+            {{ 'product.in_stock_count' | t({ count: product.stock }) }}
+          </span>
+        {% endif %}
+      {% else %}
+        <span class="stock-chip stock-in">
+          <span class="dot" style="background: rgb(var(--status-positive))"></span>
+          {{ 'products.browse_label' | t }}
+        </span>
+      {% endif %}
+
+      <span class="price-tag ml-auto tgrad">
+        {% if product.min_price != product.max_price %}
+          <span x-text="appCurrency.format({{ product.min_price }}, '{{ product.currency }}')">{{ formatPrice(product.min_price, product.currency) }}</span>
+          <span class="text-faint">–</span>
+          <span x-text="appCurrency.format({{ product.max_price }}, '{{ product.currency }}')">{{ formatPrice(product.max_price, product.currency) }}</span>
+        {% elif product.min_price %}
+          <span x-text="appCurrency.format({{ product.min_price }}, '{{ product.currency }}')">{{ formatPrice(product.min_price, product.currency) }}</span>
+        {% else %}
+          -
+        {% endif %}
+      </span>
+    </div>
+
+    {% if product.min_price_slash and product.max_price_slash and product.min_price_slash != product.max_price_slash %}
+      <p class="price-slash">
+        <span x-text="appCurrency.format({{ product.min_price_slash }}, '{{ product.currency }}')">{{ formatPrice(product.min_price_slash, product.currency) }}</span>
+        –
+        <span x-text="appCurrency.format({{ product.max_price_slash }}, '{{ product.currency }}')">{{ formatPrice(product.max_price_slash, product.currency) }}</span>
+      </p>
+    {% elif product.min_price_slash %}
+      <p class="price-slash">
+        <span x-text="appCurrency.format({{ product.min_price_slash }}, '{{ product.currency }}')">{{ formatPrice(product.min_price_slash, product.currency) }}</span>
+      </p>
+    {% endif %}
+  </div>
+</a>

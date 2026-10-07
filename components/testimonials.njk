@@ -1,0 +1,39 @@
+{% set rawData = feedbacks if feedbacks and feedbacks|length > 0 else (latest_feedbacks if latest_feedbacks and latest_feedbacks|length > 0 else []) %}
+{% set amount = properties.amount if properties.amount else 12 %}
+{% set reviewData = rawData.slice(0, amount) %}
+
+<section id="{{ componentId }}" class="component" data-component-id="{{ componentId }}">
+  <div class="py-6 lg:py-8">
+    {% if reviewData|length > 0 %}
+      {% set half = (reviewData|length / 2) | round(0, 'ceil') %}
+      {% set rowOne = reviewData.slice(0, half) %}
+      {% set rowTwo = reviewData.slice(half) %}
+      {% if rowTwo|length == 0 %}{% set rowTwo = rowOne %}{% endif %}
+      <div class="v6-pdp__reviews">
+        <div class="v6-pdp__reviews-head">
+          {% if properties.eyebrow %}<span class="v6-eyebrow"><i></i>{{ properties.eyebrow | renderString }}</span>{% endif %}
+          {% if properties.title %}<h2>{{ properties.title | renderString }}</h2>{% endif %}
+          {% if properties.link_text %}
+            <a href="{{ properties.link_url | shopUrl }}">{{ properties.link_text }} <i class="fa-solid fa-arrow-right"></i></a>
+          {% endif %}
+        </div>
+        <div class="v6-marquee">
+          <div class="v6-marquee__row v6-marquee__row--a">
+            <div class="v6-marquee__track">
+              {% for feedback in rowOne %}{% render_snippet "review-card.njk", feedback=feedback %}{% endfor %}
+              {% for feedback in rowOne %}{% render_snippet "review-card.njk", feedback=feedback %}{% endfor %}
+            </div>
+          </div>
+          <div class="v6-marquee__row v6-marquee__row--b">
+            <div class="v6-marquee__track">
+              {% for feedback in rowTwo %}{% render_snippet "review-card.njk", feedback=feedback %}{% endfor %}
+              {% for feedback in rowTwo %}{% render_snippet "review-card.njk", feedback=feedback %}{% endfor %}
+            </div>
+          </div>
+          <div class="v6-marquee__fade v6-marquee__fade--left" aria-hidden="true"></div>
+          <div class="v6-marquee__fade v6-marquee__fade--right" aria-hidden="true"></div>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</section>

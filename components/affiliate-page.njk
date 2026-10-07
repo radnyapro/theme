@@ -1,0 +1,387 @@
+{#
+  Affiliate Page dashboard component.
+  Data comes only from variables SellAuth exposes to the customer-affiliate
+  template: shop, shop_customer, referred_customers, referred_customers_paginator,
+  lifetime_earnings, affiliate_tier, has_pending_payout. Stat cards that depend
+  on a variable SellAuth does not expose are simply not rendered.
+#}
+
+{# Safe currency output: numbers and numeric strings format normally; null,
+   undefined and malformed values never reach Intl (so "$NaN" can not appear).
+   The Alpine layer mirrors this with Number(x) || 0. #}
+{% macro aff_money(value, fallback='$0.00') %}
+  {%- set v = value -%}
+  {%- if v is string -%}{% set v = v | trim | float('__not_a_number__') %}{% endif -%}
+  {%- if v is number -%}
+    {{ formatPrice(v, 'USD') }}
+  {%- else -%}
+    {{ fallback }}
+  {%- endif -%}
+{% endmacro %}
+
+{% set p = properties if properties is defined else {} %}
+{% set affiliateLink = shop.url ~ '/?a=' ~ shop_customer.affiliate_code %}
+{% set hasRate = shop.affiliate_percentage is defined and shop.affiliate_percentage is not none and shop.affiliate_percentage != '' %}
+{% set hasLifetime = lifetime_earnings is defined and lifetime_earnings is not none %}
+{% set hasBalance = shop_customer.balance is defined and shop_customer.balance is not none %}
+{% set showHeader = p.show_header is not defined or p.show_header %}
+{% set showHow = p.show_info is not defined or p.show_info %}
+
+{# Affiliate wallet / payout data. The wallet balance IS the withdrawable amount:
+   SellAuth debits it when a payout is requested and refunds it if the request is
+   cancelled or rejected. Only one open payout request is allowed per customer. #}
+{% set payoutsEnabled = false %}
+{% set payoutMinNum = 0 %}
+{% set payoutInstructions = '' %}
+{% if shop.settings and shop.settings.affiliate %}
+  {% if shop.settings.affiliate.payouts_enabled %}{% set payoutsEnabled = true %}{% endif %}
+  {% if shop.settings.affiliate.payout_min_amount is defined and shop.settings.affiliate.payout_min_amount %}{% set payoutMinNum = shop.settings.affiliate.payout_min_amount | float %}{% endif %}
+  {% if shop.settings.affiliate.payout_instructions %}{% set payoutInstructions = shop.settings.affiliate.payout_instructions %}{% endif %}
+{% endif %}
+{% set hasAffBalance = false %}
+{% if shop_customer.affiliate_balance is defined and shop_customer.affiliate_balance is not none and shop_customer.affiliate_balance != '' %}{% set hasAffBalance = true %}{% endif %}
+{% set affBalanceNum = none %}
+{% if hasAffBalance %}{% set affBalanceNum = shop_customer.affiliate_balance | float %}{% endif %}
+{% set pendingPayout = none %}
+{% if payout_requests %}
+  {% set pendingHit = payout_requests | selectattr('status', 'equalto', 'pending') | first %}
+  {% if pendingHit %}{% set pendingPayout = pendingHit %}{% endif %}
+{% endif %}
+{% set canRequestPayout = false %}
+{% if payoutsEnabled and hasAffBalance and not pendingPayout %}
+  {% if payoutMinNum <= 0 %}{% set canRequestPayout = true %}
+  {% elif affBalanceNum is not none and affBalanceNum >= payoutMinNum %}{% set canRequestPayout = true %}
+  {% endif %}
+{% endif %}
+{% set showBalancePanel = false %}
+{% if hasAffBalance or hasLifetime or pendingPayout or payoutsEnabled or payoutInstructions or p.show_balance %}{% set showBalancePanel = true %}{% endif %}
+
+<section id="{{ componentId }}" class="v6-aff component" data-component-id="{{ componentId }}">
+
+  {% if shop_customer and shop_customer.affiliate_code %}
+
+    {# ---------- Page header ---------- #}
+    {% if showHeader %}
+      <header class="v6-aff__head">
+        <div class="v6-aff__head-text">
+          {% if p.header_eyebrow %}<span class="v6-eyebrow"><i></i>{{ p.header_eyebrow | renderString }}</span>{% endif %}
+          <h1 class="v6-aff__title">{{ (p.header_title if p.header_title else 'Affiliate Program') | renderString }}</h1>
+          {% if p.header_description %}<p>{{ p.header_description | renderString }}</p>{% endif %}
+        </div>
+        {% if (affiliate_tier and affiliate_tier.name) or has_pending_payout %}
+          <div class="v6-aff__chips">
+            {% if affiliate_tier and affiliate_tier.name %}
+              <span class="v6-aff__chip"><i class="fa-solid fa-medal"></i>{{ affiliate_tier.name }}</span>
+            {% endif %}
+            {% if has_pending_payout %}
+              <span class="v6-aff__chip v6-aff__chip--pending"><i class="fa-solid fa-clock"></i>Payout processing</span>
+            {% endif %}
+          </div>
+        {% endif %}
+      </header>
+    {% endif %}
+
+    {# ---------- Overview cards (only data SellAuth actually exposes) ---------- #}
+    {% if referred_customers or referred_customers_paginator or hasRate %}
+      <div class="v6-aff__stats">
+        {% if referred_customers or referred_customers_paginator %}
+          {% set referredCount = referred_customers_paginator.total if referred_customers_paginator and referred_customers_paginator.total is defined else (referred_customers | length) %}
+          <div class="v6-aff__stat v6-spot-border">
+            <span class="v6-aff__stat-icon"><i class="fa-solid fa-users"></i></span>
+            <div class="v6-aff__stat-body">
+              <strong data-v6-count="{{ referredCount }}">{{ referredCount }}</strong>
+              <small>Referred Customers</small>
+            </div>
+          </div>
+        {% endif %}
+        {% if hasRate %}
+          <div class="v6-aff__stat v6-spot-border">
+            <span class="v6-aff__stat-icon"><i class="fa-solid fa-percent"></i></span>
+            <div class="v6-aff__stat-body">
+              <strong>{{ shop.affiliate_percentage }}%</strong>
+              <small>Affiliate Rate</small>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    {# ---------- Affiliate balance / withdraw ---------- #}
+    {% if showBalancePanel %}
+      <div class="v6-aff__panel v6-aff__balance v6-spot-border">
+        <div class="v6-aff__panel-head">
+          <div>
+            <h2>{{ (p.balance_title if p.balance_title else 'Affiliate Balance') | renderString }}</h2>
+          </div>
+        </div>
+        <div class="v6-aff__balance-grid">
+          <div class="v6-aff__balance-main">
+            <small>Available to Withdraw</small>
+            {% if hasAffBalance %}
+              <strong x-text="appCurrency.format(Number({{ shop_customer.affiliate_balance | json }}) || 0, 'USD')">{{- aff_money(shop_customer.affiliate_balance, '—') -}}</strong>
+            {% else %}
+              <strong>&mdash;</strong>
+            {% endif %}
+          </div>
+          {% if hasLifetime %}
+            <div class="v6-aff__balance-stat">
+              <small>Lifetime Earnings</small>
+              <strong x-text="appCurrency.format(Number({{ lifetime_earnings | json }}) || 0, 'USD')">{{- aff_money(lifetime_earnings, '—') -}}</strong>
+            </div>
+          {% endif %}
+          {% if pendingPayout %}
+            <div class="v6-aff__balance-stat v6-aff__balance-stat--pending">
+              <small>Pending Payouts</small>
+              <strong x-text="appCurrency.format(Number({{ pendingPayout.amount | json }}) || 0, 'USD')">{{- aff_money(pendingPayout.amount, '—') -}}</strong>
+            </div>
+          {% endif %}
+        </div>
+        {% if pendingPayout %}
+          <div class="v6-aff__withdraw v6-aff__withdraw--pending">
+            <i class="fa-solid fa-clock"></i>
+            <div>
+              <strong>Payout in progress</strong>
+              <p>Your payout request for {{ aff_money(pendingPayout.amount) }} is being processed. The amount will return to your balance if the request is cancelled or rejected.</p>
+            </div>
+          </div>
+        {% elif canRequestPayout %}
+          <div class="v6-aff__withdraw">
+            <div>
+              <strong>Ready to withdraw?</strong>
+              <p>Your available affiliate balance is {{ aff_money(shop_customer.affiliate_balance) }}.{% if payoutMinNum > 0 %} The minimum payout is {{ aff_money(payoutMinNum) }}.{% endif %}</p>
+            </div>
+            <button type="button" class="v6-aff__copy" aria-label="Request payout" @click="appAffiliate.modalPayoutOpen()"><i class="fa-solid fa-hand-holding-dollar"></i><span>Request Payout</span></button>
+          </div>
+        {% elif payoutsEnabled and hasAffBalance %}
+          <div class="v6-aff__withdraw v6-aff__withdraw--pending">
+            <i class="fa-solid fa-circle-info"></i>
+            <div>
+              <strong>Keep earning to withdraw</strong>
+              <p>Your available affiliate balance is {{ aff_money(shop_customer.affiliate_balance) }}. You need {{ aff_money(payoutMinNum - affBalanceNum) }} more to reach the minimum payout of {{ aff_money(payoutMinNum) }}.</p>
+            </div>
+          </div>
+        {% else %}
+          <div class="v6-aff__withdraw v6-aff__withdraw--info">
+            <i class="fa-solid fa-circle-info"></i>
+            <div>
+              <strong>Withdrawals</strong>
+              <p>{% if hasAffBalance %}Your available affiliate balance is {{ aff_money(shop_customer.affiliate_balance) }}. {% endif %}To request a payout, follow the store's payout instructions.</p>
+              {% if payoutInstructions %}<div class="v6-aff__instructions">{{ payoutInstructions | renderString }}</div>{% endif %}
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    {# ---------- Affiliate link ---------- #}
+    <div
+      class="v6-aff__panel v6-aff__link v6-spot-border"
+      x-data="{
+        copied: false,
+        copy() {
+          navigator.clipboard.writeText('{{ affiliateLink }}').then(() => {
+            this.copied = true;
+            setTimeout(() => { this.copied = false; }, 2000);
+          });
+        }
+      }"
+    >
+      <div class="v6-aff__panel-head">
+        <div>
+          <h2>{{ (p.link_title if p.link_title else 'Your Affiliate Link') | renderString }}</h2>
+        </div>
+        {% if shop.affiliate_code_editable %}
+          <button
+            type="button"
+            class="v6-aff__edit"
+            title="Edit Affiliate Code"
+            aria-label="Edit affiliate code"
+            @click="appAffiliate.modalEditCodeOpen('{{ shop_customer.affiliate_code }}')"
+          >
+            <i class="fa-solid fa-pen"></i><span>Edit Code</span>
+          </button>
+        {% endif %}
+      </div>
+      <div class="v6-aff__link-row">
+        <input
+          class="v6-aff__link-input"
+          type="text"
+          readonly
+          value="{{ affiliateLink }}"
+          aria-label="Your affiliate link"
+          @focus="$event.target.select()"
+        >
+        <button
+          type="button"
+          class="v6-aff__copy"
+          :class="{ 'is-copied': copied }"
+          @click="copy()"
+          aria-label="Copy affiliate link"
+        >
+          <i class="fa-solid" :class="copied ? 'fa-check' : 'fa-copy'"></i>
+          <span x-text="copied ? 'Copied!' : 'Copy Link'">Copy Link</span>
+        </button>
+        <span class="sr-only" role="status" aria-live="polite" x-text="copied ? 'Affiliate link copied to clipboard' : ''"></span>
+      </div>
+      {% if p.link_helper %}<p class="v6-aff__helper">{{ p.link_helper | renderString }}</p>{% endif %}
+    </div>
+
+    {# ---------- Quick actions ---------- #}
+    <div class="v6-aff__actions">
+      <a href="{{ '/customer/balance' | shopUrl }}" class="v6-aff__action">
+        <span class="v6-aff__action-icon"><i class="fa-solid fa-wallet"></i></span>
+        <span class="v6-aff__action-body">
+          <strong>Balance</strong>
+          <small>View your available store balance</small>
+        </span>
+        <i class="fa-solid fa-arrow-right v6-aff__action-arrow"></i>
+      </a>
+      <a href="{{ '/customer/balance' | shopUrl }}" class="v6-aff__action">
+        <span class="v6-aff__action-icon"><i class="fa-solid fa-clock-rotate-left"></i></span>
+        <span class="v6-aff__action-body">
+          <strong>Balance History</strong>
+          <small>Review previous balance activity</small>
+        </span>
+        <i class="fa-solid fa-arrow-right v6-aff__action-arrow"></i>
+      </a>
+    </div>
+
+    {# ---------- Referral activity ---------- #}
+    <div class="v6-aff__panel v6-aff__activity v6-spot-border">
+      <div class="v6-aff__panel-head">
+        <div>
+          <h2>{{ (p.activity_title if p.activity_title else 'Referral Activity') | renderString }}</h2>
+          {% if p.activity_description %}<p class="v6-aff__panel-sub">{{ p.activity_description | renderString }}</p>{% endif %}
+        </div>
+      </div>
+
+      {% if referred_customers and referred_customers | length > 0 %}
+        <div class="v6-aff__table-wrap">
+          <table class="v6-aff__table">
+            <thead>
+              <tr>
+                <th scope="col">User</th>
+                <th scope="col">Amount Earned</th>
+                <th scope="col">Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for customer in referred_customers %}
+                <tr>
+                  <td data-label="User"><span class="v6-aff__user"><i class="fa-solid fa-user"></i>{{ customer.email }}</span></td>
+                  <td data-label="Amount Earned">
+                    <span class="v6-aff__amount" x-text="appCurrency.format(Number('{{ customer.affiliate_referrer_earnings }}') || 0, 'USD')">
+                      {{- aff_money(customer.affiliate_referrer_earnings) -}}
+                    </span>
+                  </td>
+                  <td data-label="Date">{{ customer.created_at | formatDateTime }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% if referred_customers_paginator.last_page > 1 %}
+          {% render_snippet "pagination.njk", paginator=referred_customers_paginator %}
+        {% endif %}
+      {% else %}
+        <div
+          class="v6-empty-state v6-aff__empty"
+          x-data="{
+            copied: false,
+            copy() {
+              navigator.clipboard.writeText('{{ affiliateLink }}').then(() => {
+                this.copied = true;
+                setTimeout(() => { this.copied = false; }, 2000);
+              });
+            }
+          }"
+        >
+          <i class="fa-solid fa-user-group"></i>
+          <h3>No referrals yet</h3>
+          <p>Share your affiliate link to begin building your referral history.</p>
+          <button type="button" class="v6-aff__copy" :class="{ 'is-copied': copied }" @click="copy()" aria-label="Copy affiliate link">
+            <i class="fa-solid" :class="copied ? 'fa-check' : 'fa-copy'"></i>
+            <span x-text="copied ? 'Copied!' : 'Copy Affiliate Link'">Copy Affiliate Link</span>
+          </button>
+        </div>
+      {% endif %}
+    </div>
+
+    {# ---------- How it works ---------- #}
+    {% if showHow %}
+      <div class="v6-aff__panel v6-aff__how v6-spot-border">
+        <div class="v6-aff__panel-head">
+          <div>
+            <h2>{{ (p.info_title if p.info_title else 'How It Works') | renderString }}</h2>
+          </div>
+        </div>
+        <ol class="v6-aff__steps">
+          <li class="v6-aff__step">
+            <span class="v6-aff__step-num">01</span>
+            <div>
+              <h3>{{ (p.info_step1_title if p.info_step1_title else 'Share Your Link') | renderString }}</h3>
+              <p>{{ (p.info_step1_description if p.info_step1_description else 'Send your unique affiliate link to friends or your audience.') | renderString }}</p>
+            </div>
+          </li>
+          <li class="v6-aff__step">
+            <span class="v6-aff__step-num">02</span>
+            <div>
+              <h3>{{ (p.info_step2_title if p.info_step2_title else 'They Make a Purchase') | renderString }}</h3>
+              <p>{{ (p.info_step2_description if p.info_step2_description else 'Eligible orders made through your referral link are tracked automatically.') | renderString }}</p>
+            </div>
+          </li>
+          <li class="v6-aff__step">
+            <span class="v6-aff__step-num">03</span>
+            <div>
+              <h3>{{ (p.info_step3_title if p.info_step3_title else 'Earn Rewards') | renderString }}</h3>
+              <p>{{ (p.info_step3_description if p.info_step3_description else 'Receive the configured affiliate reward for qualifying purchases.') | renderString }}</p>
+            </div>
+          </li>
+        </ol>
+      </div>
+    {% endif %}
+
+    {# ---------- Optional notice ---------- #}
+    {% if p.show_notice and p.notice_title %}
+      <div class="v6-aff__notice">
+        <span class="v6-aff__notice-icon"><i class="fa-solid fa-circle-info"></i></span>
+        <div class="v6-aff__notice-body">
+          <strong>{{ p.notice_title | renderString }}</strong>
+          {% if p.notice_text %}<p>{{ p.notice_text | renderString }}</p>{% endif %}
+        </div>
+        {% if p.notice_button_label and p.notice_button_url %}
+          <a href="{{ p.notice_button_url }}" class="v6-aff__notice-btn">
+            <span>{{ p.notice_button_label | renderString }}</span><i class="fa-solid fa-arrow-right"></i>
+          </a>
+        {% endif %}
+      </div>
+    {% endif %}
+
+  {% elif shop_customer %}
+    {# ---------- Signed in, but no affiliate code assigned ---------- #}
+    {% if showHeader %}
+      <header class="v6-aff__head">
+        <div class="v6-aff__head-text">
+          {% if p.header_eyebrow %}<span class="v6-eyebrow"><i></i>{{ p.header_eyebrow | renderString }}</span>{% endif %}
+          <h1 class="v6-aff__title">{{ (p.header_title if p.header_title else 'Affiliate Program') | renderString }}</h1>
+          {% if p.header_description %}<p>{{ p.header_description | renderString }}</p>{% endif %}
+        </div>
+      </header>
+    {% endif %}
+    <div class="v6-empty-state v6-aff__empty v6-aff__empty--solo">
+      <i class="fa-solid fa-link-slash"></i>
+      <h3>No affiliate link yet</h3>
+      <p>No affiliate link has been assigned to your account. Please contact us to enroll in the affiliate program.</p>
+    </div>
+  {% else %}
+    {# ---------- Not signed in ---------- #}
+    <div class="v6-empty-state v6-aff__empty v6-aff__empty--solo">
+      <i class="fa-solid fa-lock"></i>
+      <h3>Sign in required</h3>
+      <p>Sign in to your account to view your affiliate dashboard.</p>
+    </div>
+  {% endif %}
+
+</section>
+
+{% render_snippet "affiliate-payout-modal.njk" %}

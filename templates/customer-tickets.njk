@@ -1,0 +1,77 @@
+{% set statusLabelMap = {
+  'pending': 'Awaiting Your Response',
+  'open': 'Awaiting Support Response',
+  'closed': 'Closed'
+} %}
+
+<div class="container mx-auto">
+  <div class="relative px-4 lg:px-0 py-6 lg:py-8">
+    <div class="w-full mx-auto flex flex-col gap-4 md:gap-6 lg:gap-8 lg:flex-row">
+      <div class="lg:flex-1">
+        {% render_snippet "customer-sidebar.njk" %}
+      </div>
+      <div class="lg:w-3/4">
+        <div class="flex items-center gap-3 border border-accent-500/10 bg-accent-500/5 rounded-md p-3 mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="size-5 text-accent-500" fill="currentColor" viewBox="0 0 256 256"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm16-40a8,8,0,0,1-8,8,16,16,0,0,1-16-16V128a8,8,0,0,1,0-16,16,16,0,0,1,16,16v40A8,8,0,0,1,144,176ZM112,84a12,12,0,1,1,12,12A12,12,0,0,1,112,84Z"></path></svg>
+          <p class="flex-1 text-sm text-t-primary/80">
+            {% set ordersLink = '<a href="' ~ ('/customer/invoices' | shopUrl) ~ '" class="text-accent-500 hover:underline">' ~ ('customer.orders' | t) ~ '</a>' %}
+            {{ 'ticket.open_hint' | t({ link: ordersLink, button: ('ticket.open' | t) }) | safe }}
+          </p>
+        </div>
+
+        <div class="flex flex-col p-3 md:p-4 lg:p-5 bg-card border border-white/5 rounded-lg">
+          <h3 class="text-base text-t-primary/80">
+            {{ 'ticket.plural' | t }}
+          </h3>
+          <div class="mt-4 rounded-lg overflow-y-hidden">
+            {% if tickets.length > 0 %}
+              <table class="w-full text-left text-sm text-t-primary/80">
+                <thead class="text-xs text-t-primary/60 uppercase bg-white/5">
+                  <tr>
+                    <th scope="col" class="px-6 py-3">{{ 'common.subject' | t }}</th>
+                    <th scope="col" class="px-6 py-3">{{ 'common.status' | t }}</th>
+                    <th scope="col" class="px-6 py-3">{{ 'ticket.opened_at' | t }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for ticket in tickets %}
+                    <tr class="border-b border-white/5">
+                      <td class="px-6 py-4 truncate">
+                        <a href="{{ ('/customer/tickets/' ~ ticket.id) | shopUrl }}" class="text-accent-500 hover:underline">
+                          {{ ticket.subject }}
+                        </a>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        {% if ticket.status in statusLabelMap %}
+                          {{ statusLabelMap[ticket.status] }}
+                        {% else %}
+                          <span class="capitalize">{{ ticket.status | replace('_', ' ') }}</span>
+                        {% endif %}
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        {{ ticket.created_at | formatDateTime }}
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            {% else %}
+              <p class="text-sm text-t-primary/60">
+                {{ 'ticket.none' | t }}
+              </p>
+            {% endif %}
+          </div>
+          {% if tickets_paginator.last_page > 1 %}
+            {% render_snippet "pagination.njk", paginator=tickets_paginator %}
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="components">
+  {% for componentId in components_order %}
+    {% render_component componentId %}
+  {% endfor %}
+</div>

@@ -1,0 +1,377 @@
+{% set title_to_use = properties.default_title %}
+{% if category and properties.category_title %}
+  {% set title_to_use = properties.category_title %}
+{% endif %}
+
+<section
+  class="component section"
+  data-component-id="{{ componentId }}"
+  x-data="abProducts('pp-data-{{ componentId }}', '{{ '/product/' | shopUrl }}', { out: '{{ 'product.out_of_stock' | t | jsEscape }}', in: '{{ 'product.in_stock' | t | jsEscape }}', count: '{{ 'product.in_stock_count' | t | jsEscape }}' })"
+  @keydown.escape.window="closeGroupModal()"
+>
+  {# ---------- Data island: real SellAuth items (groups + flattened children) ---------- #}
+  <script type="application/json" id="pp-data-{{ componentId }}">
+  {% set _pp = [] %}
+  {% for item in items %}
+    {% if item.type == 'group' %}
+      {% set _ = _pp.push({ id: item.id, name: item.name, type: 'group', count: item.products | length, image: item.image_url }) %}
+      {% for p in item.products %}
+        {% set _ = _pp.push({ id: p.id, name: p.name, type: 'product', groupId: item.id, path: p.path, price: p.min_price, maxPrice: p.max_price, currency: p.currency, image: p.image_url, stock: p.stock, desc: p.description, variants: p.variants }) %}
+      {% endfor %}
+    {% elif not item.group_id %}
+      {% set _ = _pp.push({ id: item.id, name: item.name, type: 'product', groupId: null, path: item.path, price: item.min_price, maxPrice: item.max_price, currency: item.currency, image: item.image_url, stock: item.stock, variants: item.variants }) %}
+    {% endif %}
+  {% endfor %}
+  { "items": {{ _pp | json }} }
+  </script>
+
+  <div class="wrap">
+    {% if breadcrumbs %}
+      <nav class="flex items-center flex-wrap gap-2 text-sm text-faint mb-6" aria-label="{{ 'common.breadcrumbs' | t }}">
+        {% for crumb in breadcrumbs %}
+          {% if crumb.url %}
+            <a href="{{ crumb.url }}" class="hover:text-t-primary transition">{{ crumb.name }}</a>
+          {% else %}
+            <span class="text-muted">{{ crumb.name }}</span>
+          {% endif %}
+          {% if not loop.last %}<span class="opacity-50">/</span>{% endif %}
+        {% endfor %}
+      </nav>
+    {% endif %}
+
+    <div class="section-head mb-8">
+      <span class="eyebrow">{{ 'products.catalog_eyebrow' | t }}</span>
+      {% if title_to_use %}
+        <h1 class="title">{{ title_to_use | renderString }}</h1>
+      {% endif %}
+    </div>
+
+    {# ---------- Browsing controls (instant, client-side) ---------- #}
+    <div class="gcard pp-controls" data-reveal>
+      <div class="pp-controls__search">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="pp-controls__searchicon" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" /></svg>
+        <input type="text" x-model.debounce.150ms="q" placeholder="{{ 'products.search_short_placeholder' | t }}" aria-label="{{ 'common.keyword' | t }}" />
+      </div>
+
+      {% if category_links | length > 0 %}
+        <label class="pp-select">
+          <span class="sr-only">{{ 'common.categories' | t }}</span>
+          <select @change="window.location.href = $event.target.value">
+            <option value="{{ '/products' | shopUrl }}" {% if not category %}selected{% endif %}>{{ 'header.all_categories' | t }}</option>
+            {% for cat in category_links %}
+              <option value="{{ cat.url }}" {% if category and category.id == cat.id %}selected{% endif %}>{{ cat.name }}</option>
+            {% endfor %}
+          </select>
+        </label>
+      {% endif %}
+
+      <div class="pp-price">
+        <span class="pp-price-label">{{ 'products.price_range' | t }}</span>
+        <input type="number" min="0" x-model.number.debounce.200ms="priceMin" placeholder="{{ 'products.min' | t }}" aria-label="{{ 'products.min' | t }}" />
+        <span class="pp-dash" aria-hidden="true">&ndash;</span>
+        <input type="number" min="0" x-model.number.debounce.200ms="priceMax" placeholder="{{ 'products.max' | t }}" aria-label="{{ 'products.max' | t }}" />
+      </div>
+
+      {% if properties.show_az is not defined or properties.show_az %}
+        <label class="pp-select">
+          <span class="sr-only">Sort</span>
+          <select x-model="sort" aria-label="Sort products">
+            <option value="featured">Featured</option>
+            <option value="az">A &ndash; Z</option>
+            <option value="za">Z &ndash; A</option>
+            <option value="price-asc">Price: Low to High</option>
+            <option value="price-desc">Price: High to Low</option>
+          </select>
+        </label>
+      {% endif %}
+
+      <button type="button" class="pp-reset" @click="reset()">
+        <svg xmlns="http://www.w3.org/2000/svg" class="size-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M16 3h5v5" /><path d="M8 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5m-4-4 4-5" /><path stroke-linecap="round" stroke-linejoin="round" d="M4 5v5h5" /></svg>
+        <span>{{ 'common.reset' | t }}</span>
+      </button>
+    </div>
+
+    {# ---------- Group selection ---------- #}
+    {% if properties.show_groups is not defined or properties.show_groups %}
+      {% set _groups = items | selectattr('type', 'equalto', 'group') | list %}
+      {% if _groups | length > 0 %}
+        <div class="pp-groups" data-reveal>
+          <button type="button" class="filter-pill" :class="{ 'active': view === 'all' }" @click="setView('all')">
+            {{ 'header.all_categories' | t }}
+          </button>
+          {% for g in _groups %}
+            <button type="button" class="filter-pill" :class="{ 'active': view === '{{ g.id }}' }" @click="setView('{{ g.id }}')">
+              {{ g.name | renderString }}
+              <span class="pp-pill-count" x-text="groupCounts['{{ g.id }}'] || 0"></span>
+            </button>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endif %}
+
+    {# ---------- Result count ---------- #}
+    <p class="pp-count" aria-live="polite">
+      <span x-text="filtered.length"></span>
+      <span x-text="filtered.length === 1 ? 'product' : 'products'"></span>
+    </p>
+
+    {# ---------- Grid (client-rendered, instant combined filters) ---------- #}
+    <div class="pp-grid" x-show="filtered.length">
+      <template x-for="item in filtered" :key="item.type + '-' + item.id">
+        <div class="w-full">
+          {# ----- Group card ----- #}
+          <template x-if="item.type === 'group'">
+            <a href="javascript:void(0);" @click="openGroupModal(item.id)" class="pcard block h-full">
+              <div class="pcard-media">
+                <template x-if="item.image">
+                  <img :src="item.image" :alt="item.name" class="aspect-group-card-image w-full object-cover" loading="lazy" />
+                </template>
+                <template x-if="!item.image">
+                  <div class="flex justify-center items-center aspect-group-card-image" style="background: color-mix(in srgb, rgb(var(--cl-accent)) 5%, transparent);">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="size-16" viewBox="0 0 256 256" style="color: color-mix(in srgb, rgb(var(--cl-accent)) 40%, transparent)"><path fill="currentColor" d="m222.72 67.91l-88-48.18a13.9 13.9 0 0 0-13.44 0l-88 48.18A14 14 0 0 0 26 80.18v95.64a14 14 0 0 0 7.28 12.27l88 48.18a13.92 13.92 0 0 0 13.44 0l88-48.18a13.92 13.92 0 0 0 7.28-12.27V80.18a14 14 0 0 0-7.28-12.27ZM127 30.25a2 2 0 0 1 1.92 0L212.51 76l-33.94 18.57l-84.52-46.26ZM122 223l-83-45.43a2 2 0 0 1-1-1.75V86.66l84 46ZM43.49 76l38.07-20.85l84.51 46.26L128 122.24ZM218 175.82a2 2 0 0 1-1 1.75L134 223v-90.36l36-19.71V152a6 6 0 0 0 12 0v-45.63l36-19.71Z"/></svg>
+                  </div>
+                </template>
+              </div>
+              <div class="pcard-body">
+                <h3 class="pcard-title" x-text="item.name"></h3>
+                <p class="pcard-desc"><span x-text="item.count"></span>&nbsp;<span x-text="item.count === 1 ? 'product' : 'products'"></span></p>
+                <div class="pcard-meta">
+                  <span class="stock-chip stock-in">
+                    <span class="dot" style="background: rgb(var(--status-positive))"></span>
+                    Browse
+                  </span>
+                </div>
+              </div>
+            </a>
+          </template>
+
+          {# ----- Product card ----- #}
+          <template x-if="item.type === 'product'">
+            <a :href="item.link" class="pcard block h-full">
+              <div class="pcard-media">
+                <template x-if="item.image">
+                  <img :src="item.image" :alt="item.name" class="aspect-product-card-image w-full object-cover" loading="lazy" />
+                </template>
+                <template x-if="!item.image">
+                  <div class="flex justify-center items-center aspect-product-card-image" style="background: color-mix(in srgb, rgb(var(--cl-accent)) 5%, transparent);">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="size-16" viewBox="0 0 256 256" style="color: color-mix(in srgb, rgb(var(--cl-accent)) 40%, transparent)"><path fill="currentColor" d="m222.72 67.91l-88-48.18a13.9 13.9 0 0 0-13.44 0l-88 48.18A14 14 0 0 0 26 80.18v95.64a14 14 0 0 0 7.28 12.27l88 48.18a13.92 13.92 0 0 0 13.44 0l88-48.18a13.92 13.92 0 0 0 7.28-12.27V80.18a14 14 0 0 0-7.28-12.27ZM127 30.25a2 2 0 0 1 1.92 0L212.51 76l-33.94 18.57l-84.52-46.26ZM122 223l-83-45.43a2 2 0 0 1-1-1.75V86.66l84 46ZM43.49 76l38.07-20.85l84.51 46.26L128 122.24ZM218 175.82a2 2 0 0 1-1 1.75L134 223v-90.36l36-19.71V152a6 6 0 0 0 12 0v-45.63l36-19.71Z"/></svg>
+                  </div>
+                </template>
+              </div>
+              <div class="pcard-body">
+                <h3 class="pcard-title" x-text="item.name"></h3>
+                <p class="pcard-desc" x-show="item.desc" x-text="stripped(item.desc)"></p>
+                <div class="pcard-meta">
+                  <span class="stock-chip" :class="Number(item.stock) === 0 ? 'stock-out' : 'stock-in'">
+                    <span class="dot" :style="'background: rgb(var(--status-' + (Number(item.stock) === 0 ? 'error' : 'positive') + '))'"></span>
+                    <span x-text="stockText(item)"></span>
+                  </span>
+                  <span class="price-tag ml-auto tgrad">
+                    <span x-show="Number(item.maxPrice) && Number(item.maxPrice) !== Number(item.price)" x-text="appCurrency.format(Number(item.price), item.currency)"></span>
+                    <span class="text-faint" x-show="Number(item.maxPrice) && Number(item.maxPrice) !== Number(item.price)">&ndash;</span>
+                    <span x-text="appCurrency.format(Number(item.maxPrice) && Number(item.maxPrice) !== Number(item.price) ? Number(item.maxPrice) : Number(item.price), item.currency)"></span>
+                  </span>
+                </div>
+                <p class="price-slash" x-show="item.slashMin" x-text="item.slashMin ? appCurrency.format(item.slashMin, item.currency) : ''"></p>
+              </div>
+            </a>
+          </template>
+        </div>
+      </template>
+    </div>
+
+    {# ---------- Empty state ---------- #}
+    <div class="empty-state" x-show="!filtered.length" x-cloak>
+      <svg xmlns="http://www.w3.org/2000/svg" class="size-8 opacity-40" viewBox="0 0 24 24"><path fill="currentColor" d="M11 18q-.425 0-.712-.288T10 17t.288-.712T11 16h2q.425 0 .713.288T14 17t-.288.713T13 18zm-4-5q-.425 0-.712-.288T6 12t.288-.712T7 11h10q.425 0 .713.288T18 12t-.288.713T17 13zM4 8q-.425 0-.712-.288T3 7t.288-.712T4 6h16q.425 0 .713.288T21 7t-.288.713T20 8z"/></svg>
+      <p>{{ 'products.none_found' | t }}</p>
+      <button type="button" class="btn btn-soft btn-sm mt-3" @click="reset()">{{ 'common.reset' | t }}</button>
+    </div>
+
+    {# ---------- Server pagination (unfiltered browsing only) ---------- #}
+    {% if items_paginator.last_page > 1 %}
+      <div class="mt-10" x-show="view === 'all' && !q && !priceMin && !priceMax && sort === 'featured'">
+        {% render_snippet "pagination.njk", paginator=items_paginator %}
+      </div>
+    {% endif %}
+  </div>
+
+  {# ---------- Group quick-view modals (unchanged) ---------- #}
+  {% for item in items %}
+    {% if item.type == 'group' %}
+      <div x-cloak x-show="openGroupModalId == '{{ item.id }}'" @keydown.escape.window="closeGroupModal()" class="fixed inset-0 z-50 overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen p-4 text-center">
+          <div
+            x-cloak
+            @click="closeGroupModal"
+            x-show="openGroupModalId == '{{ item.id }}'"
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0"
+            class="modal-backdrop"
+          ></div>
+          <div
+            x-cloak
+            x-show="openGroupModalId == '{{ item.id }}'"
+            x-transition:enter="transition ease-out duration-300 transform"
+            x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+            x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+            x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+            x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+            class="group-modal-content gcard gcard-glow w-full max-w-[76rem] p-4 text-left md:p-8"
+          >
+            <div class="flex items-start justify-between gap-4 mb-6">
+              <div>
+                <p class="eyebrow mb-1">{{ 'products.category_eyebrow' | t }}</p>
+                <h3 class="font-display text-xl font-bold tracking-tight md:text-2xl">{{ item.name }}</h3>
+              </div>
+              <button @click="closeGroupModal" class="icon-btn" aria-label="{{ 'common.close' | t }}">
+                <svg xmlns="http://www.w3.org/2000/svg" class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 18 18 6M6 6l12 12"/></svg>
+              </button>
+            </div>
+            <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {% for product in item.products %}
+                {% render_snippet "product-card.njk", product=product %}
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+  {% endfor %}
+</section>
+
+<script>
+  document.addEventListener('alpine:init', () => {
+    Alpine.data('abProducts', (dataElId, productBase, labels) => ({
+      labels: labels || {},
+      items: [],
+      view: 'all',
+      q: '',
+      priceMin: null,
+      priceMax: null,
+      sort: 'featured',
+      openGroupModalId: null,
+
+      get groups() {
+        return this.items.filter(i => i.type === 'group');
+      },
+
+      get groupCounts() {
+        const counts = {};
+        this.items.forEach(i => {
+          if (i.type === 'product' && i.groupId) counts[i.groupId] = (counts[i.groupId] || 0) + 1;
+        });
+        return counts;
+      },
+
+      get baseItems() {
+        if (this.view === 'all') {
+          return this.items.filter(i => i.type === 'group' || !i.groupId);
+        }
+        return this.items.filter(i => i.type === 'product' && String(i.groupId) === String(this.view));
+      },
+
+      get filtered() {
+        let list = this.baseItems;
+        const q = this.q.trim().toLowerCase();
+        if (q) list = list.filter(i => i.name.toLowerCase().includes(q));
+        const min = parseFloat(this.priceMin);
+        const max = parseFloat(this.priceMax);
+        if (!isNaN(min)) list = list.filter(i => Number(i.price) >= min);
+        if (!isNaN(max)) list = list.filter(i => Number(i.price) <= max);
+        switch (this.sort) {
+          case 'az': list = [...list].sort((a, b) => a.name.localeCompare(b.name)); break;
+          case 'za': list = [...list].sort((a, b) => b.name.localeCompare(a.name)); break;
+          case 'price-asc': list = [...list].sort((a, b) => Number(a.price || 0) - Number(b.price || 0)); break;
+          case 'price-desc': list = [...list].sort((a, b) => Number(b.price || 0) - Number(a.price || 0)); break;
+        }
+        return list;
+      },
+
+      openGroupModal(id) {
+        this.openGroupModalId = id;
+        document.body.style.overflow = 'hidden';
+        document.body.classList.add('t-scroll-locked');
+      },
+
+      closeGroupModal() {
+        this.openGroupModalId = null;
+        document.body.style.overflow = '';
+        document.body.classList.remove('t-scroll-locked');
+      },
+
+      setView(id) { this.view = String(id); },
+
+      reset() {
+        this.view = 'all';
+        this.q = '';
+        this.priceMin = null;
+        this.priceMax = null;
+        this.sort = 'featured';
+      },
+
+      stripped(html) {
+        return String(html || '').replace(/<[^>]*>/g, '').trim().slice(0, 110);
+      },
+
+      stockText(item) {
+        if (Number(item.stock) === 0) return this.labels.out;
+        if (Number(item.stock) === -1) return this.labels.in;
+        return String(this.labels.count || '').replace('{count}', item.stock);
+      },
+
+      init() {
+        let parsed = {};
+        try {
+          const el = document.getElementById(dataElId);
+          if (el) parsed = JSON.parse(el.textContent.replace(/&quot;/g, '"').replace(/&#0?39;/g, "'"));
+        } catch (e) {}
+        this.items = ((parsed && parsed.items) || []).map(p => ({
+          ...p,
+          link: p.type === 'group' ? 'javascript:void(0);' : (productBase + p.path)
+        }));
+      },
+    }));
+  });
+</script>
+
+<script>
+  /* Catalog sync: real SellAuth products/groups -> localStorage cache
+     consumed by the cart-page recommendations marquee. */
+  (function () {
+    var el = document.getElementById('pp-data-{{ componentId }}');
+    if (!el) return;
+    try {
+      var parsed = JSON.parse(el.textContent.replace(/&quot;/g, '"').replace(/&#0?39;/g, "'"));
+      var catalog = {
+        updatedAt: Date.now(),
+        items: [],
+        groups: []
+      };
+      (parsed.items || []).forEach(function (p) {
+        if (p.type === 'group') {
+          catalog.groups.push({ id: p.id, name: p.name, count: p.count });
+        } else {
+          var variants = (p.variants || []).map(function (v) { return { id: v.id, name: v.name, stock: v.stock }; });
+          catalog.items.push({
+            id: p.id,
+            name: p.name,
+            path: p.path,
+            price: p.price,
+            maxPrice: p.maxPrice,
+            currency: p.currency,
+            image: p.image,
+            stock: p.stock,
+            groupId: p.groupId,
+            variants: variants
+          });
+        }
+      });
+      localStorage.setItem('sf_catalog', JSON.stringify(catalog));
+    } catch (e) {}
+  })();
+</script>

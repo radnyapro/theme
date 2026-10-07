@@ -1,0 +1,17 @@
+<article class="v6-review-card v6-spot-border">
+  <div class="v6-review-card__top">
+    <span class="v6-review-card__stars">
+      {% for i in range(0, feedback.rating) %}<i class="fa-solid fa-star"></i>{% endfor %}
+      {% for i in range(0, 5 - feedback.rating) %}<i class="fa-regular fa-star"></i>{% endfor %}
+    </span>
+    <time>{{ feedback.created_at | formatDate }}</time>
+  </div>
+  <p class="v6-review-card__message">{{ feedback.message }}</p>
+  <footer>
+    <span class="v6-review-card__avatar"><i class="fa-solid fa-user"></i></span>
+    <div class="v6-review-card__meta">
+      <small>Verified purchase</small>
+      <strong>{% if feedback.items|length > 0 %}{{ feedback.items[0].name }}{% else %}{{ shop.name }}{% endif %}</strong>
+    </div>
+  </footer>
+</article>

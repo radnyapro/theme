@@ -1,0 +1,11 @@
+<a href="{{ ('/product/' + product.path) | shopUrl }}" class="gcard gcard-hover flex justify-between items-center gap-4 p-4 md:p-5">
+  <h2 class="flex-1 truncate text-[0.95rem] font-semibold tracking-tight md:text-base">{{ product.name }}</h2>
+  <div class="flex items-center gap-3 status flex-none" data-color="{{ product.status_color }}" data-label="{{ product.status_text }}">
+    <div class="relative size-3 rounded-full" style="background-color: {{ product.status_color }}">
+      <div class="pulsating" style="background-color: {{ product.status_color }}"></div>
+    </div>
+    <span class="text-sm font-semibold" style="color: {{ product.status_color }}">
+      {{ product.status_text }}
+    </span>
+  </div>
+</a>

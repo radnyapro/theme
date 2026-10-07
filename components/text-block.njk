@@ -1,0 +1,55 @@
+{% set titleAlignClassMap = {
+  'left': '',
+  'center': 'items-center text-center',
+  'right': 'items-end text-right'
+} %}
+
+{% set contentAlignClassMap = {
+  'left': 'text-left',
+  'center': 'mx-auto text-center',
+  'right': 'ml-auto mr-0 text-right'
+} %}
+
+{% set buttonAlignClassMap = {
+  'left': 'justify-start',
+  'center': 'justify-center',
+  'right': 'justify-end'
+} %}
+
+{% set titleAlignClass = titleAlignClassMap[properties.title_alignment] %}
+{% set contentAlignClass = contentAlignClassMap[properties.content_alignment] %}
+{% set buttonAlignClass = buttonAlignClassMap[properties.content_alignment] %}
+
+{% set backgroundClass = 'bg-card border border-white/5 rounded-lg text-t-primary p-4 md:p-6' if properties.show_background else '' %}
+
+<section id="{{ componentId }}" class="component" data-component-id="{{ componentId }}">
+  <div class="py-6 lg:py-8">
+    {% if properties.title and not properties.show_background %}
+      <div class="mb-4 {{ titleAlignClass }}">
+        <h2 class="inline text-t-primary text-2xl font-bold pl-2 border-l-4 border-l-accent-500">
+          {{ properties.title | renderString }}
+        </h2>
+      </div>
+    {% endif %}
+
+    <div class="{{ backgroundClass }}">
+      {% if properties.title and properties.show_background %}
+        <div class="mb-4 {{ titleAlignClass }}">
+          <h2 class="inline text-t-primary text-2xl font-bold pl-2 border-l-4 border-l-accent-500">
+            {{ properties.title | renderString }}
+          </h2>
+        </div>
+      {% endif %}
+      <div class="{{ contentAlignClass }}">
+        <p class="text-base text-t-primary/50">
+          <span class="whitespace-pre-line">{{ properties.text | renderString }}</span>
+        </p>
+        {% if properties.buttons and properties.buttons.length > 0 %}
+        <div class="flex flex-wrap items-center gap-4 mt-4 {{ buttonAlignClass }}">
+          {% render_snippet "buttons.njk", buttons=properties.buttons %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>

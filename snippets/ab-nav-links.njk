@@ -1,0 +1,4 @@
+{% for link in global.components.header.links %}
+  {% set active = (link.link == '/' and templateName == 'shop') or (link.link == '/status' and templateName == 'status') or (link.link == '/feedback' and templateName == 'feedback') %}
+  <a href="{{ link.link | shopUrl }}" {% if active %}aria-current="page"{% endif %} {% if link.new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}>{{ link.text }}</a>
+{% endfor %}

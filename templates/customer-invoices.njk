@@ -1,0 +1,116 @@
+{% set statusColorMap = {
+  'pending': 'bg-yellow-500/20 text-yellow-500 border-yellow-500/10',
+  'confirming': 'bg-blue-500/20 text-blue-500 border-blue-500/10',
+  'partially_completed': 'bg-yellow-500/20 text-yellow-500 border-yellow-500/10',
+  'completed': 'bg-green-500/20 text-green-500 border-green-500/10',
+  'out_of_stock': 'bg-orange-500/20 text-orange-500 border-orange-500/10',
+  'refunded': 'bg-teal-500/20 text-teal-500 border-teal-500/10'
+} %}
+
+<div class="container mx-auto">
+  <div class="relative px-4 lg:px-0 py-6 lg:py-8">
+    <div class="w-full mx-auto flex flex-col gap-4 md:gap-6 lg:gap-8 lg:flex-row">
+      <div class="lg:flex-1">
+        {% render_snippet "customer-sidebar.njk" %}
+      </div>
+      <div class="lg:w-3/4">
+        <div class="flex flex-col p-3 md:p-4 lg:p-5 bg-card border border-white/5 rounded-lg">
+          <h3 class="text-base text-t-primary/80">
+            {{ 'customer.order_history' | t }}
+          </h3>
+          {% if reseller_filter %}
+            <p class="text-sm text-t-primary/60 mt-1">
+              {{ 'customer.reseller_orders_only' | t }}
+              <a href="{{ '/customer/invoices' | shopUrl }}" class="text-accent-500 hover:underline">{{ 'customer.show_all_orders' | t }}</a>
+            </p>
+          {% endif %}
+          <div class="mt-4 rounded-lg overflow-y-hidden">
+            {% if invoices.data.length > 0 %}
+              <table class="w-full text-left text-sm text-t-primary/80">
+                <thead class="text-xs text-t-primary/60 uppercase bg-white/5">
+                  <tr>
+                    <th scope="col" class="px-6 py-3 w-8">ID</th>
+                    <th scope="col" class="px-6 py-3">{{ 'common.status' | t }}</th>
+                    <th scope="col" class="px-6 py-3">{{ 'common.products' | t }}</th>
+                    <th scope="col" class="px-6 py-3">{{ 'common.price' | t }}</th>
+                    <th scope="col" class="px-6 py-3">{{ 'common.action' | t }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for invoice in invoices.data %}
+                    <tr class="border-b border-white/5">
+                      <td class="px-6 py-4">
+                        <a href="{{ invoice.url }}" target="_blank" class="text-accent-500 hover:text-underline">#{{ invoice.unique_id }}</a>
+                        {% if invoice.is_reseller_order %}
+                          <span class="block mt-1 text-[10px] leading-none uppercase text-t-primary/60">
+                            Reseller{% if invoice.reseller_source == 1 %} &middot; API{% elif invoice.reseller_source == 2 %} &middot; Dynamic{% endif %}
+                          </span>
+                        {% endif %}
+                      </td>
+                      <td class="px-6 py-4 capitalize">
+                        <span>{{ invoice.status | replace('_', ' ') }}</span>
+                        <br>
+                        <span class="text-[10px] leading-none text-t-primary/60">
+                          {{ invoice.created_at | formatDateTime }}
+                        </span>
+                      </td>
+                      <td class="px-6 py-4 truncate">
+                        {% if invoice.items %}
+                          {% if invoice.items[0].custom_name %}
+                            {{ invoice.items[0].custom_name }}
+                          {% else %}
+                            {{ invoice.items[0].product.name }}
+                            {% if invoice.items[0].variant and invoice.items[0].product.name != invoice.items[0].variant.name %}
+                              ({{ invoice.items[0].variant.name }})
+                            {% endif %}
+                          {% endif %}
+
+                          {% if invoice.items.length > 1 %}
+                            & {{ invoice.items.length - 1 }} more
+                          {% endif %}
+                        {% else %}
+                          {{ 'feedback.deleted_product' | t }}
+                        {% endif %}
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        {{ formatPrice(invoice.price, invoice.currency) }}
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        {% if shop.tickets_enabled %}
+                          {% if invoice.ticket %}
+                            <a href="/customer/tickets/{{ invoice.ticket.id }}" class="text-accent-500 hover:underline">
+                              {{ 'ticket.view' | t }}
+                            </a>
+                          {% else %}
+                            <button type="button" x-on:click="appTickets.modalOpen('{{ invoice.unique_id }}')" class="text-accent-500 hover:underline">
+                              {{ 'ticket.open' | t }}
+                            </button>
+                          {% endif %}
+                        {% endif %}
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            {% else %}
+              <p class="text-sm text-t-primary/60">
+                {{ 'customer.no_orders' | t }}
+              </p>
+            {% endif %}
+          </div>
+          {% if invoices.last_page > 1 %}
+            {% render_snippet "pagination.njk", paginator=invoices %}
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="components">
+  {% for componentId in components_order %}
+    {% render_component componentId %}
+  {% endfor %}
+</div>
+
+{% render_snippet "ticket-create-modal.njk" %}

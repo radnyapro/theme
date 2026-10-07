@@ -1,0 +1,76 @@
+<div class="gcard overflow-hidden">
+  <div class="p-5 border-b" style="border-color: color-mix(in srgb, rgb(var(--cl-t-primary)) 7%, transparent);">
+    <p class="eyebrow mb-1.5">{{ 'customer.area_eyebrow' | t }}</p>
+    <h3 class="font-display text-lg font-bold tracking-tight">
+      {{ 'customer.dashboard_title' | t }}
+    </h3>
+    <p class="text-sm text-muted mt-2 truncate">
+      {{ 'customer.logged_in_as' | t }} <span class="font-medium text-t-primary">{{ shop_customer.email }}</span>
+    </p>
+  </div>
+  <ul class="flex flex-col p-2.5">
+    <li>
+      <a href="{{ '/customer/dashboard' | shopUrl }}" class="cust-link {{ 'cust-link-active' if templateName == 'customer-dashboard' }}">
+        <svg xmlns="http://www.w3.org/2000/svg" class="size-4 opacity-70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        {{ 'customer.dashboard' | t }}
+      </a>
+    </li>
+    <li>
+      <a href="{{ '/customer/invoices' | shopUrl }}" class="cust-link {{ 'cust-link-active' if templateName == 'customer-invoices' }}">
+        <svg xmlns="http://www.w3.org/2000/svg" class="size-4 opacity-70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg>
+        {{ 'customer.orders' | t }}
+      </a>
+    </li>
+    {% if shop.subscriptions_enabled %}
+      <li>
+        <a href="{{ '/customer/subscriptions' | shopUrl }}" class="cust-link {{ 'cust-link-active' if templateName == 'customer-subscriptions' }}">
+          <svg xmlns="http://www.w3.org/2000/svg" class="size-4 opacity-70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9"/><path d="M21 3v9h-9"/></svg>
+          {{ 'subscription.plural' | t }}
+        </a>
+      </li>
+    {% endif %}
+    {% if shop.tickets_enabled %}
+      <li>
+        <a href="{{ '/customer/tickets' | shopUrl }}" class="cust-link {{ 'cust-link-active' if templateName == 'customer-tickets' or templateName == 'customer-ticket' }}">
+          <svg xmlns="http://www.w3.org/2000/svg" class="size-4 opacity-70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          {{ 'ticket.plural' | t }}
+        </a>
+      </li>
+    {% endif %}
+    {% if shop.customer_balance_enabled %}
+      <li>
+        <a href="{{ '/customer/balance' | shopUrl }}" class="cust-link {{ 'cust-link-active' if templateName == 'customer-balance' }}">
+          <svg xmlns="http://www.w3.org/2000/svg" class="size-4 opacity-70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span class="flex-1">{{ 'common.balance' | t }}</span>
+          <span class="price-tag tgrad !text-sm">
+            <span x-text="appCurrency.format({{ shop_customer.balance }}, 'USD')">
+              {{ formatPrice(shop_customer.balance, 'USD') }}
+            </span>
+          </span>
+        </a>
+      </li>
+    {% endif %}
+    {% if shop.settings.reseller.enabled %}
+      <li>
+        <a href="{{ '/customer/reseller' | shopUrl }}" class="cust-link {{ 'cust-link-active' if templateName == 'customer-reseller' }}">
+          <svg xmlns="http://www.w3.org/2000/svg" class="size-4 opacity-70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 3 4 4-4 4"/><path d="M20 7H4"/><path d="m8 21-4-4 4-4"/><path d="M4 17h16"/></svg>
+          {{ 'reseller.title' | t }}
+        </a>
+      </li>
+    {% endif %}
+    {% if shop.settings.affiliate.enabled %}
+      <li>
+        <a href="{{ '/customer/affiliate' | shopUrl }}" class="cust-link {{ 'cust-link-active' if templateName == 'customer-affiliate' }}">
+          <svg xmlns="http://www.w3.org/2000/svg" class="size-4 opacity-70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m16 8-2.5 5.5L8 16l2.5-5.5Z"/></svg>
+          {{ 'affiliate.title' | t }}
+        </a>
+      </li>
+    {% endif %}
+    <li>
+      <button type="button" @click="appCustomer.logout()" class="cust-link w-full !text-left cursor-pointer">
+        <svg xmlns="http://www.w3.org/2000/svg" class="size-4 opacity-70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg>
+        {{ 'customer.logout' | t }}
+      </button>
+    </li>
+  </ul>
+</div>

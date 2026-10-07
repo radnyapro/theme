@@ -1,0 +1,7 @@
+<section id="{{ componentId }}" class="component ab-section ab-benefits" data-component-id="{{ componentId }}" {% render_snippet 'ab-section-style.njk' %}>
+  <div class="ab-benefit-grid">
+    {% for item in properties.items %}
+      <article><i class="{{ item.icon or 'fa-solid fa-check' }}" aria-hidden="true"></i><div><h3>{{ item.title }}</h3><p>{{ item.description }}</p>{% if item.link %}<a href="{{ item.link | shopUrl }}">Learn more →</a>{% endif %}</div></article>
+    {% endfor %}
+  </div>
+</section>

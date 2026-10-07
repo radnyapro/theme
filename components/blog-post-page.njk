@@ -1,0 +1,49 @@
+<section id="{{ componentId }}" class="component section" data-component-id="{{ componentId }}">
+  <div class="wrap">
+    <div class="max-w-3xl mx-auto">
+      <div class="gcard p-6 md:p-10">
+        <div class="section-head !mb-6">
+          <span class="eyebrow">{{ 'blog.post_eyebrow' | t }}</span>
+          <h1 class="title">{{ blogPost.title }}</h1>
+        </div>
+
+        {% if blogPost.summary %}
+          <p class="text-muted text-[0.95rem] leading-relaxed mb-6">
+            {{ blogPost.summary }}
+          </p>
+        {% endif %}
+
+        {% if blogPost.image_url %}
+          <img src="{{ blogPost.image_url }}" alt="{{ blogPost.title }}" class="rounded-[calc(var(--radius-card)-6px)] w-full mb-6" loading="lazy" />
+        {% endif %}
+
+        <div class="editor legal-body">
+          {{ blogPost.content | safe }}
+        </div>
+
+        <div class="flex items-center justify-end mt-6 pt-5" style="border-top: 1px solid color-mix(in srgb, rgb(var(--cl-t-primary)) 7%, transparent);">
+          <p class="text-sm text-faint">
+            {{ 'blog.published_at' | t }}
+            <span class="font-medium text-muted">
+              {{ blogPost.created_at | formatDate }}
+            </span>
+          </p>
+        </div>
+      </div>
+
+      {% if properties.show_featured_products != false and featured_products | length %}
+        <div class="mt-10">
+          <div class="section-head">
+            <span class="eyebrow">{{ 'blog.featured_eyebrow' | t }}</span>
+            <h2 class="title">{{ 'blog.featured_products' | t }}</h2>
+          </div>
+          <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+            {% for product in featured_products %}
+              {% render_snippet "product-card.njk", product=product %}
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</section>

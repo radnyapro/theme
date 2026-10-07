@@ -1,0 +1,1667 @@
+{
+  "global": {
+    "properties": {
+      "accent_color": {
+        "label": "Accent Color",
+        "type": "color"
+      },
+      "accent_color_2": {
+        "label": "Accent Color 2 (gradient end)",
+        "type": "color",
+        "default": "#d16bff"
+      },
+      "border_color": {
+        "label": "Border Tint Color",
+        "help": "Used for card borders and subtle outlines",
+        "type": "color",
+        "default": "#ff8fc7"
+      },
+      "background_color": {
+        "label": "Background Color",
+        "type": "color"
+      },
+      "card_color": {
+        "label": "Card Background Color",
+        "type": "color"
+      },
+      "text_primary_color": {
+        "label": "Primary Text Color",
+        "type": "color",
+        "default": "#ffffff"
+      },
+      "text_accent_color": {
+        "label": "Accent Text Color",
+        "type": "color",
+        "default": "#ffffff"
+      },
+      "font": {
+        "label": "Body Font",
+        "type": "text",
+        "default": "Inter",
+        "datalist": [
+          "Inter",
+          "Poppins",
+          "Nunito Sans",
+          "DM Sans",
+          "Rubik",
+          "Outfit"
+        ]
+      },
+      "display_font": {
+        "label": "Heading Font",
+        "type": "text",
+        "default": "Space Grotesk",
+        "datalist": [
+          "Space Grotesk",
+          "Sora",
+          "Outfit",
+          "Plus Jakarta Sans",
+          "Poppins",
+          "Chakra Petch"
+        ]
+      },
+      "mono_font": {
+        "label": "Mono Font (prices & codes)",
+        "type": "text",
+        "default": "JetBrains Mono",
+        "datalist": [
+          "JetBrains Mono",
+          "IBM Plex Mono",
+          "Fira Code",
+          "Source Code Pro"
+        ]
+      },
+      "card_radius": {
+        "label": "Card Border Radius (px)",
+        "type": "number",
+        "default": 20
+      },
+      "input_radius": {
+        "label": "Input Border Radius (px)",
+        "type": "number",
+        "default": 12
+      },
+      "button_radius": {
+        "label": "Button Border Radius (px)",
+        "type": "number",
+        "default": 12
+      },
+      "control_height": {
+        "label": "Button / Input Height (px)",
+        "type": "number",
+        "default": 44
+      },
+      "container_width": {
+        "label": "Container Width (px)",
+        "type": "number",
+        "default": 1200
+      },
+      "show_ambient_particles": {
+        "label": "Ambient Floating Particles",
+        "help": "Soft bokeh dots drifting down the page",
+        "type": "toggle",
+        "default": true
+      },
+      "status_positive_color": {
+        "label": "Positive Status Color",
+        "type": "color",
+        "default": "#00d294"
+      },
+      "status_warning_color": {
+        "label": "Warning Status Color",
+        "type": "color",
+        "default": "#fcbb00"
+      },
+      "status_error_color": {
+        "label": "Error Status Color",
+        "type": "color",
+        "default": "#ff6568"
+      },
+      "snow": {
+        "label": "Snow Effect",
+        "type": "toggle",
+        "default": false
+      },
+      "snow_color": {
+        "label": "Snowflake Color",
+        "type": "color",
+        "default": "#ffffff"
+      },
+      "product_card_image_aspect_ratio": {
+        "label": "Product Card Image Aspect Ratio",
+        "type": "text",
+        "default": "16/9",
+        "datalist": [
+          "1/1",
+          "4/3",
+          "16/9"
+        ]
+      },
+      "product_page_image_aspect_ratio": {
+        "label": "Product Page Image Aspect Ratio",
+        "type": "text",
+        "default": "16/9",
+        "datalist": [
+          "1/1",
+          "4/3",
+          "16/9"
+        ]
+      },
+      "product_image_fit": {
+        "label": "Product Image Fit",
+        "type": "select",
+        "options": [
+          "scale-down",
+          "cover"
+        ],
+        "default": "cover"
+      },
+      "group_card_image_aspect_ratio": {
+        "label": "Group Card Image Aspect Ratio",
+        "type": "text",
+        "default": "16/9",
+        "datalist": [
+          "1/1",
+          "4/3",
+          "16/9"
+        ]
+      },
+      "group_image_fit": {
+        "label": "Group Image Fit",
+        "type": "select",
+        "options": [
+          "scale-down",
+          "cover"
+        ],
+        "default": "cover"
+      },
+      "blog_card_image_aspect_ratio": {
+        "label": "Blog Card Image Aspect Ratio",
+        "type": "text",
+        "default": "16/9",
+        "datalist": [
+          "1/1",
+          "4/3",
+          "16/9"
+        ]
+      },
+      "blog_image_fit": {
+        "label": "Blog Image Fit",
+        "type": "select",
+        "options": [
+          "scale-down",
+          "cover"
+        ],
+        "default": "cover"
+      }
+    }
+  },
+  "components": {
+    "announcement": {
+      "label": "Announcement",
+      "global": true,
+      "order": 0,
+      "properties": {
+        "announcements": {
+          "label": "Announcements",
+          "type": "list",
+          "maxItems": 10,
+          "properties": {
+            "text": {
+              "label": "Text",
+              "type": "text",
+              "default": "New Announcement"
+            },
+            "link": {
+              "label": "Link",
+              "type": "text",
+              "default": null
+            },
+            "new_tab": {
+              "label": "Open in New Tab",
+              "type": "toggle",
+              "default": false
+            }
+          }
+        }
+      }
+    },
+    "header": {
+      "label": "Header",
+      "global": true,
+      "order": 1,
+      "properties": {
+        "show_shop_name": {
+          "label": "Show Shop Name",
+          "help": "Defined in Shop Settings",
+          "type": "toggle",
+          "default": true
+        },
+        "show_logo": {
+          "label": "Show Logo",
+          "help": "Defined in Shop Settings",
+          "type": "toggle",
+          "default": true
+        },
+        "cta_text": {
+          "label": "Find Order Button Text",
+          "help": "Opens the email login used to look up orders",
+          "type": "text",
+          "default": "Find order"
+        },
+        "hide_currency_selector": {
+          "label": "Hide Currency Selector",
+          "type": "toggle",
+          "default": false
+        },
+        "hide_language_selector": {
+          "label": "Hide Language Selector",
+          "type": "toggle",
+          "default": false
+        },
+        "hide_customer_dashboard": {
+          "label": "Hide Login / My Account / Find Order",
+          "type": "toggle",
+          "default": false
+        },
+        "hide_cart": {
+          "label": "Hide Cart",
+          "type": "toggle",
+          "default": false
+        },
+        "links": {
+          "label": "Links",
+          "type": "list",
+          "maxItems": 10,
+          "properties": {
+            "text": {
+              "label": "Text",
+              "type": "text",
+              "default": "New Link"
+            },
+            "link": {
+              "label": "Link",
+              "type": "text",
+              "default": "#"
+            },
+            "new_tab": {
+              "label": "Open in New Tab",
+              "type": "toggle",
+              "default": false
+            }
+          },
+          "default": [
+            {
+              "text": "Products",
+              "link": "/products"
+            },
+            {
+              "text": "Reviews",
+              "link": "/feedback"
+            },
+            {
+              "text": "Status",
+              "link": "/status"
+            },
+            {
+              "text": "FAQ",
+              "link": "/faq"
+            },
+            {
+              "text": "Blog",
+              "link": "/blog"
+            }
+          ]
+        }
+      }
+    },
+    "hero": {
+      "label": "Hero",
+      "multiple": false,
+      "properties": {
+        "eyebrow": {
+          "label": "Badge Text",
+          "type": "text",
+          "default": "Trusted by {{ shop.total_customers }}+ customers"
+        },
+        "title": {
+          "label": "Heading (plain, after gradient)",
+          "type": "text",
+          "default": "delivered instantly."
+        },
+        "title_accent": {
+          "label": "Gradient Lead Text",
+          "help": "Shown first, with the gradient applied",
+          "type": "text",
+          "default": "Digital products,"
+        },
+        "subtitle": {
+          "label": "Description",
+          "type": "textarea",
+          "default": "Keys and accounts delivered automatically after checkout. Pay the way you want and get your order in seconds."
+        },
+        "button_text": {
+          "label": "Primary Button Text",
+          "type": "text",
+          "default": "Browse products"
+        },
+        "button_link": {
+          "label": "Primary Button Link",
+          "type": "text",
+          "default": "/products"
+        },
+        "secondary_button_text": {
+          "label": "Secondary Button Text",
+          "type": "text",
+          "default": "Reviews"
+        },
+        "secondary_button_link": {
+          "label": "Secondary Button Link",
+          "type": "text",
+          "default": "/feedback"
+        },
+        "show_stats": {
+          "label": "Show Shop Stats",
+          "help": "Uses real shop data",
+          "type": "toggle",
+          "default": true
+        },
+        "show_mock": {
+          "label": "Show Delivery Preview Card",
+          "type": "toggle",
+          "default": true
+        },
+        "mock_title": {
+          "label": "Preview Card Title",
+          "type": "text",
+          "default": "Instant delivery"
+        },
+        "mock_key_label": {
+          "label": "Preview Key Label",
+          "type": "text",
+          "default": "Order #4821"
+        },
+        "mock_key": {
+          "label": "Preview Key Text",
+          "type": "text",
+          "default": "KEY-••••-••••-••••"
+        },
+        "mock_animate": {
+          "label": "Animate Delivery Card",
+          "help": "Loops an automated fulfillment demo: live progress bar, cycling license key and a Delivered state. Turn off to show a static completed card.",
+          "type": "toggle",
+          "default": true
+        },
+        "mock_duration": {
+          "label": "Delivery Animation Duration (milliseconds)",
+          "help": "How long the delivery demo takes to reach 100% before its short completed pause and loop.",
+          "type": "number",
+          "default": 3200
+        },
+        "secondary_button_icon": {
+          "label": "Secondary Button Icon",
+          "type": "icon",
+          "default": "fas fa-star"
+        },
+        "show_payment_rail": {
+          "label": "Show Payment Methods Rail",
+          "help": "Marquee of your active payment methods below the hero",
+          "type": "toggle",
+          "default": true
+        },
+        "rail_label": {
+          "label": "Payment Rail Label",
+          "type": "text",
+          "default": "Checkout · methods shown at payment"
+        },
+        "mock_badge": {
+          "label": "Showcase Status Pill Text",
+          "type": "text",
+          "default": "Online"
+        },
+        "mock_bar_label": {
+          "label": "Showcase Progress Label",
+          "type": "text",
+          "default": "Instant delivery"
+        }
+      }
+    },
+    "features": {
+      "label": "Feature Grid",
+      "multiple": true,
+      "properties": {
+        "eyebrow": {
+          "label": "Eyebrow",
+          "type": "text",
+          "default": "Why us"
+        },
+        "title": {
+          "label": "Title",
+          "type": "text",
+          "default": "Built for"
+        },
+        "title_accent": {
+          "label": "Gradient Word",
+          "type": "text",
+          "default": "speed."
+        },
+        "subtitle": {
+          "label": "Description",
+          "type": "textarea",
+          "default": "Everything is automated so you get from checkout to your order in seconds."
+        },
+        "center_head": {
+          "label": "Center Header",
+          "type": "toggle",
+          "default": false
+        },
+        "columns": {
+          "label": "Columns (desktop)",
+          "type": "select",
+          "options": [
+            2,
+            3,
+            4
+          ],
+          "default": 3
+        },
+        "items": {
+          "label": "Feature Cards",
+          "type": "list",
+          "maxItems": 12,
+          "properties": {
+            "icon": {
+              "label": "Icon",
+              "type": "icon",
+              "default": "fas fa-bolt"
+            },
+            "title": {
+              "label": "Title",
+              "type": "text",
+              "default": "New Feature"
+            },
+            "description": {
+              "label": "Description",
+              "type": "textarea",
+              "default": "Describe this feature."
+            }
+          },
+          "default": [
+            {
+              "icon": "fas fa-bolt",
+              "title": "Instant delivery",
+              "description": "Orders are delivered automatically the moment your payment clears."
+            },
+            {
+              "icon": "fas fa-shield-halved",
+              "title": "Secure checkout",
+              "description": "Payments are processed through encrypted, trusted providers."
+            },
+            {
+              "icon": "fas fa-headset",
+              "title": "Real support",
+              "description": "Questions or issues? The team replies fast, every day."
+            }
+          ]
+        }
+      }
+    },
+    "bento": {
+      "label": "Bento Grid",
+      "multiple": true,
+      "properties": {
+        "eyebrow": {
+          "label": "Eyebrow",
+          "type": "text",
+          "default": "How it works"
+        },
+        "title": {
+          "label": "Title",
+          "type": "text",
+          "default": "From cart to"
+        },
+        "title_accent": {
+          "label": "Gradient Word",
+          "type": "text",
+          "default": "key in seconds."
+        },
+        "subtitle": {
+          "label": "Description",
+          "type": "textarea",
+          "default": "Three steps, zero waiting."
+        },
+        "center_head": {
+          "label": "Center Header",
+          "type": "toggle",
+          "default": false
+        },
+        "animate_progress": {
+          "label": "Animate Card Flow",
+          "help": "Walks through the cards one by one with a top accent fill, a journey rail and highlighted active card.",
+          "type": "toggle",
+          "default": true
+        },
+        "animation_speed": {
+          "label": "Card Flow Duration (milliseconds)",
+          "help": "How long each card stays active before moving to the next one.",
+          "type": "number",
+          "default": 3200
+        },
+        "items": {
+          "label": "Bento Cards",
+          "type": "list",
+          "maxItems": 8,
+          "properties": {
+            "icon": {
+              "label": "Icon",
+              "type": "icon"
+            },
+            "stat": {
+              "label": "Corner Stat (optional)",
+              "type": "text"
+            },
+            "title": {
+              "label": "Title",
+              "type": "text",
+              "default": "New Card"
+            },
+            "description": {
+              "label": "Description",
+              "type": "textarea",
+              "default": "Describe this card."
+            },
+            "link": {
+              "label": "Link URL (optional)",
+              "type": "text"
+            },
+            "link_text": {
+              "label": "Link Text (optional)",
+              "type": "text"
+            },
+            "wide": {
+              "label": "Wide Card (2 columns)",
+              "type": "toggle",
+              "default": false
+            }
+          },
+          "default": [
+            {
+              "icon": "fas fa-cart-shopping",
+              "title": "1. Add to cart",
+              "description": "Pick a product and any options — no account required.",
+              "wide": false
+            },
+            {
+              "icon": "fas fa-credit-card",
+              "title": "2. Pay your way",
+              "description": "Cards, crypto and more — choose what suits you at checkout."
+            },
+            {
+              "icon": "fas fa-key",
+              "title": "3. Get your order",
+              "description": "Your keys or access appear instantly — on screen and in your email."
+            }
+          ]
+        }
+      }
+    },
+    "stats": {
+      "label": "Statistics",
+      "multiple": true,
+      "properties": {}
+    },
+    "cta": {
+      "label": "Call to Action",
+      "multiple": true,
+      "properties": {
+        "eyebrow": {
+          "label": "Eyebrow",
+          "type": "text",
+          "default": "Ready when you are"
+        },
+        "title": {
+          "label": "Title",
+          "type": "text",
+          "default": "Get started"
+        },
+        "title_accent": {
+          "label": "Gradient Word",
+          "type": "text",
+          "default": "in seconds."
+        },
+        "subtitle": {
+          "label": "Description",
+          "type": "textarea",
+          "default": "Browse the catalog and check out with your favorite payment method."
+        },
+        "button_text": {
+          "label": "Button Text",
+          "type": "text",
+          "default": "Shop now"
+        },
+        "button_link": {
+          "label": "Button Link",
+          "type": "text",
+          "default": "/products"
+        }
+      }
+    },
+    "categories": {
+      "label": "Categories",
+      "multiple": true,
+      "properties": {
+        "eyebrow": {
+          "label": "Eyebrow",
+          "type": "text",
+          "default": "Categories"
+        },
+        "title": {
+          "label": "Title",
+          "type": "text",
+          "default": "Shop by category"
+        },
+        "subtitle": {
+          "label": "Description",
+          "type": "textarea"
+        },
+        "center_head": {
+          "label": "Center Header",
+          "type": "toggle",
+          "default": false
+        },
+        "centered": {
+          "label": "Center Categories",
+          "help": "This will center the categories if there are not enough to fill the row.",
+          "type": "toggle",
+          "default": true
+        }
+      }
+    },
+    "products": {
+      "label": "Products",
+      "multiple": true,
+      "properties": {
+        "eyebrow": {
+          "label": "Eyebrow",
+          "type": "text",
+          "default": "Catalog"
+        },
+        "title": {
+          "label": "Title",
+          "type": "text",
+          "default": "Featured products"
+        },
+        "title_accent": {
+          "label": "Gradient Word",
+          "type": "text"
+        },
+        "subtitle": {
+          "label": "Description",
+          "type": "textarea"
+        },
+        "center_head": {
+          "label": "Center Header",
+          "type": "toggle",
+          "default": false
+        },
+        "ids": {
+          "label": "Handpick Products and Groups (optional)",
+          "type": "products_and_groups",
+          "default": []
+        },
+        "show_searchbar": {
+          "label": "Show Searchbar",
+          "type": "toggle",
+          "default": true
+        },
+        "centered": {
+          "label": "Center Products",
+          "help": "This will center the products if there are not enough to fill the row.",
+          "type": "toggle",
+          "default": false
+        }
+      }
+    },
+    "feedbacks": {
+      "label": "Reviews",
+      "multiple": true,
+      "properties": {
+        "eyebrow": {
+          "label": "Eyebrow",
+          "type": "text",
+          "default": "Reviews"
+        },
+        "title": {
+          "label": "Title",
+          "type": "text",
+          "default": null
+        },
+        "title_accent": {
+          "label": "Gradient Word",
+          "type": "text"
+        },
+        "subtitle": {
+          "label": "Description",
+          "type": "textarea"
+        },
+        "center_head": {
+          "label": "Center Header",
+          "type": "toggle",
+          "default": false
+        },
+        "layout": {
+          "label": "Layout",
+          "help": "Marquee shows reviews in two slow, infinitely looping rails (top scrolls left, bottom scrolls right) on the storefront. Grid keeps the classic layout; the reviews page and paginated lists always use the grid.",
+          "type": "select",
+          "options": [
+            "marquee",
+            "grid"
+          ],
+          "default": "marquee"
+        },
+        "marquee_speed": {
+          "label": "Marquee Duration (seconds)",
+          "help": "Seconds for one full loop of the top review rail. The bottom rail drifts slightly slower.",
+          "type": "number",
+          "default": 44
+        },
+        "amount": {
+          "label": "Amount",
+          "type": "number",
+          "default": null
+        },
+        "hide_automatic_feedbacks": {
+          "label": "Hide Automatic Feedbacks",
+          "help": "Hides the automatic feedbacks submitted after 7 days. Takes effect on your live shop only, the visual editor preview keeps showing them.",
+          "type": "toggle",
+          "default": false
+        }
+      }
+    },
+    "text-block": {
+      "label": "Text",
+      "multiple": true,
+      "properties": {
+        "title": {
+          "label": "Title",
+          "type": "text",
+          "default": "Text Block"
+        },
+        "text": {
+          "label": "Text",
+          "type": "textarea",
+          "default": "This is a text block."
+        },
+        "buttons": {
+          "label": "Buttons",
+          "type": "list",
+          "maxItems": 4,
+          "properties": {
+            "text": {
+              "label": "Text",
+              "type": "text",
+              "default": "New Button"
+            },
+            "icon": {
+              "label": "Icon",
+              "type": "icon"
+            },
+            "link": {
+              "label": "Link",
+              "type": "text",
+              "default": "#"
+            },
+            "new_tab": {
+              "label": "Open in New Tab",
+              "type": "toggle",
+              "default": false
+            }
+          },
+          "default": [
+            {
+              "text": "Shop Now",
+              "icon": "fas fa-shopping-cart",
+              "link": "/products",
+              "new_tab": false,
+              "color": "primary",
+              "style": "regular"
+            }
+          ]
+        },
+        "show_background": {
+          "label": "Show Background",
+          "type": "toggle",
+          "default": false
+        },
+        "title_alignment": {
+          "label": "Title Alignment",
+          "type": "select",
+          "options": [
+            "left",
+            "center",
+            "right"
+          ],
+          "default": "left"
+        },
+        "content_alignment": {
+          "label": "Content Alignment",
+          "type": "select",
+          "options": [
+            "left",
+            "center",
+            "right"
+          ],
+          "default": "left"
+        }
+      }
+    },
+    "text-image-block": {
+      "label": "Text & Image",
+      "multiple": true,
+      "properties": {
+        "title": {
+          "label": "Title",
+          "type": "text",
+          "default": "Text & Image Block"
+        },
+        "text": {
+          "label": "Text",
+          "type": "textarea",
+          "default": "This is a text & image block."
+        },
+        "image": {
+          "label": "Image",
+          "type": "image"
+        },
+        "buttons": {
+          "label": "Buttons",
+          "type": "list",
+          "maxItems": 4,
+          "properties": {
+            "text": {
+              "label": "Text",
+              "type": "text",
+              "default": "New Button"
+            },
+            "icon": {
+              "label": "Icon",
+              "type": "icon"
+            },
+            "link": {
+              "label": "Link",
+              "type": "text",
+              "default": "#"
+            },
+            "new_tab": {
+              "label": "Open in New Tab",
+              "type": "toggle",
+              "default": false
+            }
+          },
+          "default": [
+            {
+              "text": "Shop Now",
+              "icon": "fas fa-shopping-cart",
+              "link": "/products",
+              "new_tab": false,
+              "color": "primary",
+              "style": "regular"
+            }
+          ]
+        },
+        "aspect_ratio": {
+          "label": "Aspect Ratio",
+          "type": "select",
+          "options": [
+            "Default",
+            "1/1",
+            "4/3",
+            "16/9"
+          ],
+          "default": "16/9"
+        },
+        "show_background": {
+          "label": "Show Background",
+          "type": "toggle",
+          "default": false
+        },
+        "title_alignment": {
+          "label": "Title Alignment",
+          "type": "select",
+          "options": [
+            "left",
+            "center",
+            "right"
+          ],
+          "default": "left"
+        },
+        "content_alignment": {
+          "label": "Content Alignment",
+          "type": "select",
+          "options": [
+            "left",
+            "center",
+            "right"
+          ],
+          "default": "left"
+        }
+      }
+    },
+    "text-video-block": {
+      "label": "Text & Video",
+      "multiple": true,
+      "properties": {
+        "title": {
+          "label": "Title",
+          "type": "text",
+          "default": "Text & Video Block"
+        },
+        "text": {
+          "label": "Text",
+          "type": "textarea",
+          "default": "This is a text & video block."
+        },
+        "video_link": {
+          "label": "YouTube Video Link",
+          "type": "text"
+        },
+        "buttons": {
+          "label": "Buttons",
+          "type": "list",
+          "maxItems": 4,
+          "properties": {
+            "text": {
+              "label": "Text",
+              "type": "text",
+              "default": "New Button"
+            },
+            "icon": {
+              "label": "Icon",
+              "type": "icon"
+            },
+            "link": {
+              "label": "Link",
+              "type": "text",
+              "default": "#"
+            },
+            "new_tab": {
+              "label": "Open in New Tab",
+              "type": "toggle",
+              "default": false
+            }
+          },
+          "default": [
+            {
+              "text": "Shop Now",
+              "icon": "fas fa-shopping-cart",
+              "link": "/products",
+              "new_tab": false,
+              "color": "primary",
+              "style": "regular"
+            }
+          ]
+        },
+        "show_background": {
+          "label": "Show Background",
+          "type": "toggle",
+          "default": false
+        },
+        "title_alignment": {
+          "label": "Title Alignment",
+          "type": "select",
+          "options": [
+            "left",
+            "center",
+            "right"
+          ],
+          "default": "left"
+        },
+        "content_alignment": {
+          "label": "Content Alignment",
+          "type": "select",
+          "options": [
+            "left",
+            "center",
+            "right"
+          ],
+          "default": "left"
+        }
+      }
+    },
+    "image-gallery": {
+      "label": "Image Gallery",
+      "multiple": true,
+      "properties": {
+        "title": {
+          "label": "Title",
+          "type": "text",
+          "default": "Gallery"
+        },
+        "items_per_row": {
+          "label": "Items per row",
+          "type": "select",
+          "options": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "default": 2
+        },
+        "aspect_ratio": {
+          "label": "Aspect Ratio",
+          "type": "select",
+          "options": [
+            "Default",
+            "1/1",
+            "4/3",
+            "16/9"
+          ],
+          "default": "16/9"
+        },
+        "images": {
+          "type": "image",
+          "maxImages": 50,
+          "default": []
+        }
+      }
+    },
+    "video-gallery": {
+      "label": "Video Gallery",
+      "multiple": true,
+      "properties": {
+        "title": {
+          "label": "Title",
+          "type": "text",
+          "default": "Gallery"
+        },
+        "items_per_row": {
+          "label": "Items per row",
+          "type": "select",
+          "options": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "default": 2
+        },
+        "videos": {
+          "label": "Videos",
+          "type": "list",
+          "maxItems": 10,
+          "properties": {
+            "link": {
+              "label": "YouTube Video Link",
+              "type": "text"
+            },
+            "aspect_ratio": {
+              "label": "Aspect Ratio",
+              "type": "select",
+              "options": [
+                "16/9",
+                "9/16"
+              ],
+              "default": "16/9"
+            }
+          }
+        }
+      }
+    },
+    "faq": {
+      "label": "FAQ",
+      "multiple": true,
+      "properties": {
+        "eyebrow": {
+          "label": "Eyebrow",
+          "type": "text",
+          "default": "FAQ"
+        },
+        "title": {
+          "label": "Title",
+          "type": "text",
+          "default": "Frequently asked questions"
+        },
+        "title_accent": {
+          "label": "Gradient Word",
+          "type": "text"
+        },
+        "subtitle": {
+          "label": "Description",
+          "type": "textarea",
+          "default": "Everything you need to know before ordering."
+        },
+        "center_head": {
+          "label": "Center Header",
+          "type": "toggle",
+          "default": true
+        },
+        "items": {
+          "label": "Items",
+          "type": "list",
+          "maxItems": 10,
+          "properties": {
+            "question": {
+              "label": "Question",
+              "type": "text",
+              "default": "New Question"
+            },
+            "answer": {
+              "label": "Answer",
+              "type": "textarea",
+              "default": "New Answer"
+            }
+          },
+          "default": [
+            {
+              "question": "How fast is delivery?",
+              "answer": "Delivery is automatic — most orders arrive within seconds of a completed payment."
+            },
+            {
+              "question": "Which payment methods are accepted?",
+              "answer": "All enabled payment methods are shown at checkout."
+            },
+            {
+              "question": "How do I find my order?",
+              "answer": "Use the Find order button in the top navigation and sign in with your order email."
+            }
+          ]
+        }
+      }
+    },
+    "myvouches": {
+      "label": "MyVouches",
+      "multiple": true,
+      "properties": {
+        "title": {
+          "label": "Title",
+          "type": "text",
+          "default": "Our Vouches"
+        },
+        "username": {
+          "label": "Username",
+          "type": "text"
+        },
+        "title_alignment": {
+          "label": "Title Alignment",
+          "type": "select",
+          "options": [
+            "left",
+            "center",
+            "right"
+          ],
+          "default": "left"
+        }
+      }
+    },
+    "blog-posts": {
+      "label": "Blog Posts",
+      "multiple": false,
+      "templates": [
+        "shop",
+        "blog"
+      ],
+      "properties": {
+        "title": {
+          "label": "Title",
+          "type": "text",
+          "default": "Our Blog"
+        },
+        "amount": {
+          "label": "Amount",
+          "type": "number"
+        },
+        "centered": {
+          "label": "Center Posts",
+          "help": "This will center the posts if there are not enough to fill the row.",
+          "type": "toggle",
+          "default": true
+        }
+      }
+    },
+    "footer": {
+      "label": "Footer",
+      "global": true,
+      "order": -1,
+      "properties": {
+        "show_shop_name": {
+          "label": "Show Shop Name",
+          "help": "Defined in Shop Settings",
+          "type": "toggle",
+          "default": true
+        },
+        "show_logo": {
+          "label": "Show Logo",
+          "help": "Defined in Shop Settings",
+          "type": "toggle",
+          "default": true
+        },
+        "description": {
+          "label": "Brand Description",
+          "type": "textarea"
+        },
+        "show_stats": {
+          "label": "Show Shop Stats",
+          "help": "Real data from your shop",
+          "type": "toggle",
+          "default": true
+        },
+        "show_socials": {
+          "label": "Show Socials",
+          "type": "toggle",
+          "default": true
+        },
+        "column_1_title": {
+          "label": "Column 1 Title",
+          "type": "text",
+          "default": "Navigation"
+        },
+        "column_1_links": {
+          "label": "Column 1 Links",
+          "type": "list",
+          "maxItems": 8,
+          "properties": {
+            "text": {
+              "label": "Text",
+              "type": "text",
+              "default": "New Link"
+            },
+            "link": {
+              "label": "Link",
+              "type": "text",
+              "default": "#"
+            },
+            "new_tab": {
+              "label": "Open in New Tab",
+              "type": "toggle",
+              "default": false
+            }
+          },
+          "default": [
+            {
+              "text": "Home",
+              "link": "/"
+            },
+            {
+              "text": "Products",
+              "link": "/products"
+            },
+            {
+              "text": "Reviews",
+              "link": "/feedback"
+            },
+            {
+              "text": "Status",
+              "link": "/status"
+            },
+            {
+              "text": "FAQ",
+              "link": "/faq"
+            }
+          ]
+        },
+        "column_2_title": {
+          "label": "Column 2 Title",
+          "type": "text",
+          "default": "More"
+        },
+        "column_2_links": {
+          "label": "Column 2 Links",
+          "type": "list",
+          "maxItems": 8,
+          "properties": {
+            "text": {
+              "label": "Text",
+              "type": "text",
+              "default": "New Link"
+            },
+            "link": {
+              "label": "Link",
+              "type": "text",
+              "default": "#"
+            },
+            "new_tab": {
+              "label": "Open in New Tab",
+              "type": "toggle",
+              "default": false
+            }
+          },
+          "default": [
+            {
+              "text": "Find your order",
+              "link": "/customer/invoices"
+            },
+            {
+              "text": "Blog",
+              "link": "/blog"
+            }
+          ]
+        },
+        "copyright": {
+          "label": "Copyright",
+          "type": "textarea",
+          "default": "Copyright © {{ shop.name }} {{ '' | currentYear }}"
+        },
+        "links": {
+          "label": "Legal Links",
+          "type": "list",
+          "maxItems": 10,
+          "properties": {
+            "text": {
+              "label": "Text",
+              "type": "text",
+              "default": "New Link"
+            },
+            "link": {
+              "label": "Link",
+              "type": "text",
+              "default": "#"
+            },
+            "new_tab": {
+              "label": "Open in New Tab",
+              "type": "toggle",
+              "default": false
+            }
+          },
+          "default": [
+            {
+              "text": "Terms of Service",
+              "link": "/terms-of-service",
+              "new_tab": false
+            },
+            {
+              "text": "Privacy Policy",
+              "link": "/privacy-policy",
+              "new_tab": false
+            },
+            {
+              "text": "Refund Policy",
+              "link": "/refund-policy",
+              "new_tab": false
+            }
+          ]
+        }
+      }
+    },
+    "cart-page": {
+      "label": "Cart Page",
+      "page": true,
+      "templates": [
+        "cart"
+      ],
+      "properties": {
+        "show_recommendations": {
+          "label": "Show You May Also Like",
+          "type": "toggle",
+          "default": true
+        },
+        "recommendations_heading": {
+          "label": "Recommendations Heading",
+          "type": "text",
+          "default": "You may also like"
+        },
+        "recommendations_sub": {
+          "label": "Recommendations Subline",
+          "type": "text",
+          "default": "More from the store — picked for you."
+        },
+        "recommendations_cta": {
+          "label": "Card CTA Label",
+          "type": "text",
+          "default": "View"
+        }
+      }
+    },
+    "products-page": {
+      "label": "Products Page",
+      "page": true,
+      "templates": [
+        "products"
+      ],
+      "properties": {
+        "default_title": {
+          "label": "Default Title",
+          "type": "text",
+          "default": "All products"
+        },
+        "category_title": {
+          "label": "Category Title",
+          "type": "text",
+          "default": "{{ category.name }}"
+        },
+        "show_search": {
+          "label": "Show Search Input",
+          "type": "toggle",
+          "default": true
+        },
+        "show_price": {
+          "label": "Show Price Filter",
+          "type": "toggle",
+          "default": true
+        },
+        "show_az": {
+          "label": "Show A–Z Sort Selector",
+          "type": "toggle",
+          "default": true
+        },
+        "show_groups": {
+          "label": "Show Group Selector",
+          "type": "toggle",
+          "default": true
+        }
+      }
+    },
+    "product-page": {
+      "label": "Product Page",
+      "page": true,
+      "templates": [
+        "product"
+      ],
+      "properties": {
+        "variant_selector": {
+          "label": "Variant Selector",
+          "type": "select",
+          "options": [
+            "buttons",
+            "dropdown"
+          ],
+          "default": "buttons"
+        },
+        "show_feedbacks": {
+          "label": "Show Product Reviews",
+          "type": "toggle",
+          "default": true
+        },
+        "hide_add_to_cart": {
+          "label": "Hide Add to Cart Button",
+          "type": "toggle",
+          "default": false
+        },
+        "hide_buy_now": {
+          "label": "Hide Buy Now Button",
+          "type": "toggle",
+          "default": false
+        },
+        "hide_instant_balance_buy": {
+          "label": "Hide Buy with Balance Button",
+          "type": "toggle",
+          "default": false
+        }
+      }
+    },
+    "status-page": {
+      "label": "Status Page",
+      "page": true,
+      "templates": [
+        "status"
+      ],
+      "properties": {
+        "title": {
+          "label": "Title",
+          "type": "text",
+          "default": null
+        }
+      }
+    },
+    "terms-page": {
+      "label": "Terms Page",
+      "page": true,
+      "templates": [
+        "terms"
+      ],
+      "properties": {
+        "title": {
+          "label": "Title",
+          "type": "text",
+          "default": "Terms of Service"
+        }
+      }
+    },
+    "privacy-policy-page": {
+      "label": "Privacy Policy Page",
+      "page": true,
+      "templates": [
+        "privacy-policy"
+      ],
+      "properties": {
+        "title": {
+          "label": "Title",
+          "type": "text",
+          "default": "Privacy Policy"
+        }
+      }
+    },
+    "refund-policy-page": {
+      "label": "Refund Policy Page",
+      "page": true,
+      "templates": [
+        "refund-policy"
+      ],
+      "properties": {
+        "title": {
+          "label": "Title",
+          "type": "text",
+          "default": "Refund Policy"
+        }
+      }
+    },
+    "blog-post-page": {
+      "label": "Blog Post",
+      "page": true,
+      "templates": [
+        "blog-post"
+      ],
+      "properties": {
+        "show_featured_products": {
+          "label": "Show Featured Products",
+          "type": "toggle",
+          "default": true,
+          "help": "Products attached to the post, shown below its content."
+        }
+      }
+    },
+    "faq-discord": {
+      "label": "Join Discord Card",
+      "multiple": true,
+      "templates": [
+        "faq",
+        "custom-page"
+      ],
+      "properties": {
+        "heading": {
+          "label": "Kicker Text",
+          "help": "Optional small label above the server name.",
+          "type": "text",
+          "default": "Community"
+        },
+        "button_text": {
+          "label": "Button Text",
+          "type": "text",
+          "default": "Join Discord"
+        },
+        "discord_url": {
+          "label": "Discord Invite URL",
+          "help": "Defaults to the Discord link from Shop Settings.",
+          "type": "text",
+          "default": null
+        },
+        "open_new_tab": {
+          "label": "Open in New Tab",
+          "type": "toggle",
+          "default": true
+        },
+        "server_name": {
+          "label": "Server Name (manual fallback)",
+          "type": "text",
+          "default": null
+        },
+        "server_icon": {
+          "label": "Server Icon (manual fallback)",
+          "type": "image"
+        },
+        "members": {
+          "label": "Member Count (manual fallback)",
+          "type": "text",
+          "default": null
+        },
+        "online": {
+          "label": "Online Count (manual fallback)",
+          "type": "text",
+          "default": null
+        },
+        "stats_source": {
+          "label": "Stats Source",
+          "type": "select",
+          "options": [
+            "auto",
+            "manual"
+          ],
+          "default": "auto"
+        },
+        "show_members": {
+          "label": "Show Member Count",
+          "type": "toggle",
+          "default": true
+        },
+        "show_online": {
+          "label": "Show Online Count",
+          "type": "toggle",
+          "default": true
+        }
+      }
+    },
+    "store-recommendations": {
+      "label": "You May Also Like",
+      "multiple": true,
+      "templates": [
+        "cart",
+        "shop",
+        "product",
+        "products",
+        "faq",
+        "custom-page",
+        "blog",
+        "blog-post",
+        "feedback",
+        "status"
+      ],
+      "properties": {
+        "heading": {
+          "label": "Heading",
+          "type": "text",
+          "default": "You may also like"
+        },
+        "subheading": {
+          "label": "Subheading",
+          "type": "text",
+          "default": "More from the store — picked for you."
+        },
+        "cta_label": {
+          "label": "Card CTA Label",
+          "type": "text",
+          "default": "View"
+        }
+      }
+    }
+  }
+}

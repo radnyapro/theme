@@ -1,0 +1,82 @@
+{% set containerClass = '' %}
+{% if templateName == 'faq' %}
+  {% set containerClass = 'max-w-3xl mx-auto' %}
+{% endif %}
+
+{% set faqIndex = [] %}
+{% for item in properties.items %}
+  {% set _ = faqIndex.push((item.question | striptags | lower) ~ ' ' ~ (item.answer | striptags | lower)) %}
+{% endfor %}
+
+<section id="{{ componentId }}" class="component {{ 'section' if templateName != 'faq' else 'section-tight' }}" data-component-id="{{ componentId }}">
+  <div class="wrap">
+    <div class="section-head {{ 'center' if properties.center_head or templateName == 'faq' }}">
+      <span class="eyebrow {{ 'eyebrow-centered' if properties.center_head or templateName == 'faq' }}">{{ properties.eyebrow if properties.eyebrow else 'faq.eyebrow' | t }}</span>
+      {% if properties.title %}
+        <h2 class="title">{{ properties.title | renderString }}{% if properties.title_accent %} <span class="tgrad">{{ properties.title_accent | renderString }}</span>{% endif %}</h2>
+      {% endif %}
+      {% if properties.subtitle %}
+        <p class="sub">{{ properties.subtitle | renderString }}</p>
+      {% endif %}
+    </div>
+
+    <script>
+      window['__faqIndex_{{ componentId | replace('-', '_') }}'] = {{ faqIndex | json }};
+    </script>
+    <div class="{{ containerClass }}" x-data="faqSearch(window['__faqIndex_{{ componentId | replace('-', '_') }}'])">
+      {% if templateName == 'faq' %}
+        <div class="mb-8">
+          <div class="search-input">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+            </svg>
+            <input type="text" class="input" x-model="searchTerm" placeholder="{{ 'faq.search_placeholder' | t }}" aria-label="{{ 'faq.search_placeholder' | t }}" />
+          </div>
+        </div>
+      {% endif %}
+
+      <div class="flex flex-col">
+        {% for item in properties.items %}
+          <div class="acc" x-data="{ isOpen: false }" :class="{ 'acc-open': isOpen }" x-show="matches({{ loop.index0 }})">
+            <button type="button" class="acc-btn" @click="isOpen = !isOpen" :aria-expanded="isOpen">
+              <span>{{ item.question | renderString }}</span>
+              <span class="acc-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+              </span>
+            </button>
+            <div class="acc-panel">
+              <div>
+                <div class="acc-content">
+                  <span class="whitespace-pre-line">{{ item.answer | renderString }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+
+        {% if templateName == 'faq' %}
+          <p x-show="visibleCount === 0" x-cloak class="empty-state mt-2">
+            {{ 'faq.no_results' | t }}
+          </p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  document.addEventListener('alpine:init', () => {
+    Alpine.data('faqSearch', (index) => ({
+      index: index || [],
+      searchTerm: '',
+      matches(i) {
+        if (!this.searchTerm) return true;
+        return (this.index[i] || '').includes(this.searchTerm.toLowerCase());
+      },
+      get visibleCount() {
+        if (!this.searchTerm) return this.index.length;
+        return this.index.filter((t) => t.includes(this.searchTerm.toLowerCase())).length;
+      },
+    }));
+  });
+</script>

@@ -1,0 +1,57 @@
+<section class="v6-ba component" data-component-id="{{ componentId }}">
+  <div class="v6-section-head">
+    {% if properties.badge_text %}<span class="v6-eyebrow"><i></i>{{ properties.badge_text | renderString }}</span>{% endif %}
+    {% if properties.title %}<h2>{{ properties.title | renderString }}</h2>{% endif %}
+    {% if properties.subtitle %}<p>{{ properties.subtitle | renderString }}</p>{% endif %}
+  </div>
+
+  <div
+    class="v6-ba__frame"
+    x-data="{ pos: 50, dragging: false }"
+    :style="`--v6-ba-pos: ${pos}%`"
+    :class="dragging ? 'is-dragging' : ''"
+  >
+    <div class="v6-ba__bar">
+      <span></span><span></span><span></span>
+      <small>{{ properties.window_label }}</small>
+      {% if properties.status_text %}<em><i></i>{{ properties.status_text }}</em>{% endif %}
+    </div>
+    <div class="v6-ba__stage">
+      {% if properties.before_image %}
+        <img class="v6-ba__img v6-ba__img--before" src="{{ properties.before_image | imageUrl }}" alt="{{ properties.before_label }}">
+      {% else %}
+        <div class="v6-ba__placeholder v6-ba__placeholder--before"><i class="fa-solid fa-image"></i></div>
+      {% endif %}
+
+      <div class="v6-ba__after-wrap">
+        {% if properties.after_image %}
+          <img class="v6-ba__img v6-ba__img--after" src="{{ properties.after_image | imageUrl }}" alt="{{ properties.after_label }}">
+        {% else %}
+          <div class="v6-ba__placeholder v6-ba__placeholder--after"><i class="fa-solid fa-image"></i></div>
+        {% endif %}
+      </div>
+
+      <div class="v6-ba__divider" aria-hidden="true"></div>
+      <div class="v6-ba__handle" aria-hidden="true"><i class="fa-solid fa-left-right"></i></div>
+
+      <span class="v6-ba__tag v6-ba__tag--before">{{ properties.before_label }}</span>
+      <span class="v6-ba__tag v6-ba__tag--after">{{ properties.after_label }}</span>
+
+      <input
+        type="range"
+        min="0"
+        max="100"
+        step="0.1"
+        x-model.number="pos"
+        @pointerdown="dragging = true"
+        @pointerup.window="dragging = false"
+        @pointercancel.window="dragging = false"
+        class="v6-ba__range"
+        aria-label="Before and after comparison slider"
+      />
+    </div>
+    {% if properties.hint_text %}
+      <div class="v6-ba__hint"><i class="fa-solid fa-arrows-left-right"></i>{{ properties.hint_text }}</div>
+    {% endif %}
+  </div>
+</section>

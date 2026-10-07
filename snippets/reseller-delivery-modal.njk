@@ -1,0 +1,94 @@
+<div
+  x-show="appReseller.ddModalIsOpen"
+  x-cloak
+  class="fixed inset-0 z-50 overflow-y-auto"
+  aria-labelledby="reseller-delivery-modal-title"
+  role="dialog"
+  aria-modal="true"
+>
+  <div class="flex items-center justify-center min-h-screen px-4 text-center">
+    <div
+      x-show="appReseller.ddModalIsOpen"
+      x-transition:enter="transition ease-out duration-300 transform"
+      x-transition:enter-start="opacity-0"
+      x-transition:enter-end="opacity-100"
+      x-transition:leave="transition ease-in duration-200 transform"
+      x-transition:leave-start="opacity-100"
+      x-transition:leave-end="opacity-0"
+      @click="appReseller.closeDeliveryModal()"
+      class="fixed inset-0 transition-opacity bg-black/75"
+      aria-hidden="true"
+    ></div>
+
+    <div
+      x-show="appReseller.ddModalIsOpen"
+      x-transition:enter="transition ease-out duration-300 transform"
+      x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+      x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+      x-transition:leave="transition ease-in duration-200 transform"
+      x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+      x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+      class="inline-block w-full max-w-lg p-6 my-8 overflow-hidden text-left align-middle transition-all transform border border-white/5 rounded-lg bg-background text-t-primary"
+    >
+      <div class="flex items-start justify-between gap-4 mb-4">
+        <h3 id="reseller-delivery-modal-title" class="text-xl font-bold truncate">
+          {{ 'reseller.dynamic_delivery_title' | t }}
+        </h3>
+
+        <button @click="appReseller.closeDeliveryModal()" class="text-t-primary focus:outline-none hover:text-accent">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-7 text-t-primary/50 hover:text-accent-500">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <p class="text-sm text-t-primary/60">
+        {{ 'reseller.dd_intro' | t }}
+      </p>
+
+      <div class="mt-4">
+        <label class="block text-xs text-t-primary/60 uppercase">{{ "reseller.webhook_secret" | t }}</label>
+        <small class="block text-t-primary/50 text-xs mt-0.5">
+          {{ 'reseller.webhook_secret_hint' | t | safe }}
+        </small>
+        <input
+          type="password"
+          placeholder="{{ 'Secret saved - enter to replace' if reseller_has_webhook_secret else 'Paste your webhook secret' }}"
+          class="w-full mt-1 px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-sm text-t-primary focus:outline-none"
+          x-model="appReseller.webhookSecret"
+        >
+        <div class="flex items-center gap-2 mt-3">
+          <button
+            type="button"
+            class="px-4 py-2 rounded-lg text-sm font-semibold bg-accent-500 border border-accent-500 text-t-accent transition hover:enabled:bg-accent-500/50 disabled:opacity-50 disabled:pointer-events-none"
+            @click="appReseller.saveDynamicDelivery({{ 'false' if reseller_dd_enabled else 'true' }})"
+            :disabled="appReseller.ddLoading"
+          >
+            {{ 'Disable Dynamic Delivery' if reseller_dd_enabled else 'Enable Dynamic Delivery' }}
+          </button>
+          {% if reseller_has_webhook_secret %}
+            <button
+              type="button"
+              class="px-4 py-2 rounded-lg text-sm font-semibold border border-white/10 text-t-primary transition hover:bg-white/5 disabled:opacity-50 disabled:pointer-events-none"
+              @click="appReseller.saveDynamicDelivery({{ 'true' if reseller_dd_enabled else 'false' }})"
+              :disabled="appReseller.ddLoading"
+            >
+              {{ 'reseller.save_secret' | t }}
+            </button>
+          {% endif %}
+        </div>
+        <p class="text-xs text-t-primary/60 mt-3">
+          {{ 'common.status' | t }}: <span class="font-semibold {{ 'text-green-500' if reseller_dd_enabled else 'text-t-primary' }}">{{ ('common.enabled' | t) if reseller_dd_enabled else ('common.disabled' | t) }}</span>
+        </p>
+        <button
+          type="button"
+          class="text-xs text-t-primary/60 underline mt-2 text-left transition hover:text-t-primary"
+          @click="appReseller.regenerateDynamicToken()"
+        >
+          {{ 'reseller.regenerate_urls' | t }}
+        </button>
+        <p class="text-sm text-red-400 mt-2" x-show="appReseller.ddError" x-text="appReseller.ddError"></p>
+      </div>
+    </div>
+  </div>
+</div>

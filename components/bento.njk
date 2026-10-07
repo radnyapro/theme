@@ -1,0 +1,140 @@
+<section id="{{ componentId }}" class="component section" data-component-id="{{ componentId }}">
+  <div class="wrap">
+    <div class="section-head {{ 'center' if properties.center_head }}">
+      <span class="eyebrow {{ 'eyebrow-centered' if properties.center_head }}">{{ properties.eyebrow if properties.eyebrow else 'bento.eyebrow' | t }}</span>
+      {% if properties.title %}
+        <h2 class="title">{{ properties.title | renderString }}{% if properties.title_accent %} <span class="tgrad">{{ properties.title_accent | renderString }}</span>{% endif %}</h2>
+      {% endif %}
+      {% if properties.subtitle %}
+        <p class="sub">{{ properties.subtitle | renderString }}</p>
+      {% endif %}
+    </div>
+
+    {# wide cards need a 2-col base grid so they span the full row cleanly #}
+    {% set bentoFlags = [] %}
+    {% for item in properties.items %}
+      {% if item.wide %}{% set _ = bentoFlags.push(true) %}{% endif %}
+    {% endfor %}
+    {% set bentoCount = properties.items | length %}
+    {% set bentoAnimated = properties.animate_progress != false and bentoCount > 1 %}
+    <div class="bento-stage"{% if bentoAnimated %} x-init="window.ApartaBentoFlow && ApartaBentoFlow($el, { speed: {{ properties.animation_speed if properties.animation_speed else 3200 }} })"{% endif %}>
+      {% if bentoAnimated %}
+        {# journey rail: fills as the active card moves through the flow #}
+        <div class="bento-rail" aria-hidden="true">
+          <span class="bento-rail-line"></span>
+          <span class="bento-rail-progress"></span>
+          <span class="bento-rail-dot"></span>
+        </div>
+      {% endif %}
+      <div class="grid grid-cols-1 gap-5 md:grid-cols-2 {{ 'lg:grid-cols-3' if bentoFlags | length == 0 else 'lg:grid-cols-2' }}">
+        {% for item in properties.items %}
+          <div class="gcard gcard-hover gcard-glow bento-card p-6 md:p-7 flex flex-col gap-3 {{ 'md:col-span-2 lg:col-span-2' if item.wide }}" {% if bentoAnimated %}data-bento-card{% endif %}>
+            <span class="bento-fill" aria-hidden="true"></span>
+            <div class="flex items-start justify-between gap-4">
+              {% if item.icon %}
+                <div class="bento-icon size-11 rounded-xl grid place-items-center flex-none" style="background: color-mix(in srgb, rgb(var(--cl-accent)) 12%, transparent); color: rgb(var(--cl-accent)); border: 1px solid color-mix(in srgb, rgb(var(--cl-accent)) 22%, transparent);">
+                  <i class="{{ item.icon }} text-lg" aria-hidden="true"></i>
+                </div>
+              {% endif %}
+              {% if item.stat %}
+                <span class="tgrad font-display text-2xl font-bold tracking-tight">{{ item.stat | renderString }}</span>
+              {% endif %}
+            </div>
+            <h3 class="text-lg font-semibold tracking-tight">{{ item.title | renderString }}</h3>
+            {% if item.description %}
+              <p class="text-sm leading-relaxed text-muted">{{ item.description | renderString }}</p>
+            {% endif %}
+            {% if item.link and item.link_text %}
+              <a href="{{ item.link | shopUrl }}" class="text-sm font-semibold inline-flex items-center gap-1.5 mt-auto pt-1" style="color: rgb(var(--cl-accent))">
+                {{ item.link_text | renderString }}
+                <svg xmlns="http://www.w3.org/2000/svg" class="size-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </a>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+{% if bentoAnimated %}
+  <script>
+    // Sequential card flow for the bento grid. A single rAF loop owned by the
+    // stage fills the active card's top accent, advances the journey rail,
+    // then hands off to the next card; classes and CSS variables are written
+    // directly, and the loop pauses off-screen and dies with the element so
+    // Visual Editor re-renders never leak frames.
+    window.ApartaBentoFlow = window.ApartaBentoFlow || function (stage, options) {
+      if (!stage || stage.dataset.bentoBound) return;
+      stage.dataset.bentoBound = '1';
+
+      const cards = Array.from(stage.querySelectorAll('[data-bento-card]'));
+      if (!cards.length) return;
+      const count = cards.length;
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const speed = Math.min(8000, Math.max(1200, (options && options.speed) || 3200));
+      const hold = Math.max(500, Math.round(speed * 0.22));
+
+      let active = 0;
+      let visible = true;
+      let startedAt = null;
+      let rafId = 0;
+
+      const paint = (fill) => {
+        const overall = Math.min(1, (active + fill / 100) / count);
+        stage.style.setProperty('--bento-fill-live', fill + '%');
+        stage.style.setProperty('--bento-progress', overall.toFixed(4));
+        stage.style.setProperty('--bento-dot-x', (overall * 100).toFixed(2));
+        stage.style.setProperty('--bento-dot-opacity', overall > 0.004 && overall < 0.996 ? '1' : '0');
+        cards.forEach((card, i) => {
+          card.classList.toggle('is-active', i === active);
+          card.classList.toggle('is-complete', i < active);
+        });
+      };
+
+      const stop = () => {
+        if (rafId) window.cancelAnimationFrame(rafId);
+        rafId = 0;
+      };
+
+      const frame = (now) => {
+        if (!stage.isConnected) { stop(); return; }
+        if (!visible) { rafId = 0; return; }
+        if (startedAt === null) startedAt = now;
+        const elapsed = now - startedAt;
+        let fill;
+        if (elapsed <= speed) {
+          fill = Math.round((1 - Math.pow(1 - elapsed / speed, 3)) * 100);
+        } else if (elapsed <= speed + hold) {
+          fill = 100;
+        } else {
+          startedAt = now;
+          active = (active + 1) % count;
+          fill = 0;
+        }
+        paint(fill);
+        rafId = window.requestAnimationFrame(frame);
+      };
+
+      if (reduced) {
+        // No motion: present the finished journey.
+        active = count - 1;
+        paint(100);
+        stage.classList.add('is-static');
+        return;
+      }
+
+      if (typeof window.IntersectionObserver === 'function') {
+        new IntersectionObserver((entries) => {
+          visible = entries[0].isIntersecting;
+          if (visible) {
+            if (!rafId) rafId = window.requestAnimationFrame(frame);
+          } else {
+            stop();
+          }
+        }, { threshold: 0.2 }).observe(stage);
+      }
+
+      rafId = window.requestAnimationFrame(frame);
+    };
+  </script>
+{% endif %}

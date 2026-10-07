@@ -1,0 +1,281 @@
+<section id="{{ componentId }}" class="component section relative overflow-hidden" data-component-id="{{ componentId }}">
+  {# soft glow behind hero #}
+  <div class="absolute inset-x-0 top-0 h-full pointer-events-none" aria-hidden="true" style="background: radial-gradient(52rem 30rem at 30% 0%, color-mix(in srgb, rgb(var(--cl-accent)) 9%, transparent), transparent 65%);"></div>
+
+  <div class="wrap relative">
+    <div class="grid items-center gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
+      {# ---- Copy ---- #}
+      <div>
+        {% if properties.eyebrow %}
+          <span class="hero-badge mb-6">
+            <span class="dot dot-pulse" style="background: rgb(var(--cl-accent))"></span>
+            {{ properties.eyebrow | renderString }}
+          </span>
+        {% endif %}
+
+        <h1 class="hero-title">
+          {% if properties.title_accent %}<span class="tgrad">{{ properties.title_accent | renderString }}</span> {% endif %}{{ properties.title | renderString }}
+        </h1>
+
+        {% if properties.subtitle %}
+          <p class="hero-sub mt-5">{{ properties.subtitle | renderString }}</p>
+        {% endif %}
+
+        <div class="flex flex-wrap items-center gap-3 mt-8">
+          {% if properties.button_text %}
+            <a href="{{ properties.button_link | shopUrl }}" class="btn btn-bloom btn-lg">
+              {{ properties.button_text | renderString }}
+              <svg xmlns="http://www.w3.org/2000/svg" class="size-4" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+          {% endif %}
+          {% if properties.secondary_button_text %}
+            <a href="{{ properties.secondary_button_link | shopUrl }}" class="btn btn-ghost btn-lg">
+              {% if properties.secondary_button_icon %}<i class="{{ properties.secondary_button_icon }}" aria-hidden="true"></i>{% endif %}
+              {{ properties.secondary_button_text | renderString }}
+            </a>
+          {% endif %}
+        </div>
+
+        {% if properties.show_stats %}
+          <div class="hero-stats mt-10">
+            <div>
+              <p class="stat-num tgrad">{{ helpers.numbers.formatCompact(shop.products_sold) }}{% if shop.products_sold < 1000 %}+{% endif %}</p>
+              <p class="stat-label">{{ 'stats.orders' | t }}</p>
+            </div>
+            <div>
+              <p class="stat-num tgrad">{{ helpers.numbers.formatCompact(shop.total_customers) }}{% if shop.total_customers < 1000 %}+{% endif %}</p>
+              <p class="stat-label">{{ 'stats.customers' | t }}</p>
+            </div>
+            {% if shop.average_rating %}
+              <div>
+                <p class="stat-num tgrad">{{ helpers.numbers.formatDecimal(shop.average_rating) }}</p>
+                <p class="stat-label">{{ 'stats.rating' | t }}</p>
+              </div>
+            {% endif %}
+            {% if shop.total_feedbacks %}
+              <div>
+                <p class="stat-num tgrad">{{ helpers.numbers.formatCompact(shop.total_feedbacks) }}</p>
+                <p class="stat-label">{{ 'stats.reviews' | t }}</p>
+              </div>
+            {% endif %}
+          </div>
+        {% endif %}
+      </div>
+
+      {# ---- Visual: instant-delivery showcase ---- #}
+      {% if properties.show_mock %}
+        {% set mockKeyRaw = properties.mock_key if properties.mock_key else 'KEY-••••-••••-••••' %}
+        {% set bulletAt = mockKeyRaw.indexOf('•') %}
+        {% set mockPrefix = mockKeyRaw.slice(0, bulletAt) if bulletAt > -1 else mockKeyRaw ~ '-' %}
+        {% if mockPrefix.slice(-1) != '-' %}{% set mockPrefix = mockPrefix ~ '-' %}{% endif %}
+        {% set mockAnimated = properties.mock_animate != false %}
+        <div class="relative w-full max-w-md mx-auto lg:mx-0 lg:max-w-none" aria-hidden="true"{% if mockAnimated %} x-init="window.ApartaMockDelivery && ApartaMockDelivery($el, { duration: {{ properties.mock_duration if properties.mock_duration else 3200 }} })"{% endif %}>
+          <div class="absolute -inset-8 pointer-events-none" style="background: radial-gradient(26rem 20rem at 60% 40%, color-mix(in srgb, rgb(var(--cl-accent-2)) 16%, transparent), transparent 70%);"></div>
+          <div class="gcard gcard-glow mock-panel relative !p-5{{ ' mock-live' if mockAnimated }}" data-mock-panel>
+            {# panel header: brand + online pill #}
+            <div class="flex items-center justify-between mb-4">
+              <div class="flex items-center gap-2.5">
+                {% if shop.image_url %}
+                  <img src="{{ shop.image_url }}" alt="" class="size-6 rounded-lg object-cover ring-1 ring-white/10" />
+                {% endif %}
+                <span class="font-display text-sm font-bold tracking-tight">{{ properties.mock_title if properties.mock_title else shop.name }}</span>
+              </div>
+              <span class="pill !h-7 !text-[0.72rem]">
+                <span class="dot dot-pulse" style="background: rgb(var(--status-positive))"></span>
+                {{ properties.mock_badge if properties.mock_badge else 'Online' | t }}
+              </span>
+            </div>
+
+            {# key row #}
+            <p class="text-[0.62rem] font-semibold uppercase tracking-[0.16em] text-faint mb-1.5">{{ properties.mock_key_label if properties.mock_key_label else 'Order #4821' | t }}</p>
+            <div class="mock-row mb-4">
+              <span class="mock-key" data-mock-key-line aria-hidden="true"><span data-mock-prefix>{{ mockPrefix }}</span><span class="mock-key-cycled" data-mock-key-main>{% if mockAnimated %}····-····{% else %}••••-••••{% endif %}</span>{% if mockAnimated %}<span class="mock-key-dash">-</span><span class="mock-key-cycled mock-key-tail" data-mock-key-tail>····</span>{% else %}{{ mockKeyRaw.slice(bulletAt) if bulletAt > -1 else '' }}{% endif %}</span>
+              <span class="pill !h-7 flex-none" data-mock-copy>
+                <svg xmlns="http://www.w3.org/2000/svg" class="size-3" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg>
+                {{ 'common.copy' | t }}
+              </span>
+            </div>
+
+            {# delivery progress #}
+            <div class="mb-4">
+              <div class="flex justify-between items-baseline text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-faint mb-1.5">
+                <span>{{ properties.mock_bar_label if properties.mock_bar_label else 'Delivery' | t }}</span>
+                <span class="flex items-baseline gap-2">
+                  <span class="mock-status" data-mock-status data-label-processing="{{ 'delivery.processing' | t }}" data-label-fulfilling="{{ 'delivery.fulfilling' | t }}" data-label-delivering="{{ 'delivery.delivering' | t }}" data-label-delivered="{{ 'delivery.delivered' | t }}">{% if mockAnimated %}{{ 'delivery.delivering' | t }}{% else %}{{ 'delivery.delivered' | t }}{% endif %}</span>
+                  <span class="font-mono2 mock-pct" data-mock-pct>{% if mockAnimated %}0%{% else %}100%{% endif %}</span>
+                </span>
+              </div>
+              <div class="mock-bar"><div data-mock-bar style="width: {% if mockAnimated %}0%{% else %}100%{% endif %}"></div></div>
+            </div>
+
+            {# footer chips: real payment methods #}
+            {% set activeMethodsMock = [] %}
+            {% for method in shop.payment_methods %}
+              {% if method.is_active %}{% set _ = activeMethodsMock.push(method) %}{% endif %}
+            {% endfor %}
+            <div class="flex flex-wrap gap-2">
+              {% for method in activeMethodsMock.slice(0, 4) %}
+                <span class="pill !h-7 !text-[0.72rem]">
+                  {% if method.icon_image_url %}
+                    <img src="{{ method.icon_image_url }}" alt="" class="h-3.5" loading="lazy" />
+                  {% endif %}
+                  {{ method.checkout_name or method.name }}
+                </span>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+
+    {# ---- Payment rail marquee ---- #}
+    {% if properties.show_payment_rail %}
+      {% set activeMethods = [] %}
+      {% for method in shop.payment_methods %}
+        {% if method.is_active %}{% set _ = activeMethods.push(method) %}{% endif %}
+      {% endfor %}
+      {% if activeMethods | length > 0 %}
+        <div class="mt-16">
+          <p class="rail-label">{{ properties.rail_label if properties.rail_label else 'payment_rail.label' | t }}</p>
+          <div class="marquee marquee-mask mt-4" aria-hidden="true">
+            <div class="marquee-track">
+              {% for i in range(10) %}
+                {% for method in activeMethods %}
+                  <span class="rail-chip">
+                    <span class="dot" style="background: rgb(var(--cl-accent))"></span>
+                    {% if method.icon_image_url %}
+                      <img src="{{ method.icon_image_url }}" alt="" class="h-3.5" loading="lazy" />
+                    {% endif %}
+                    {{ method.checkout_name or method.name }}
+                  </span>
+                {% endfor %}
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      {% endif %}
+    {% endif %}
+  </div>
+</section>
+<script>
+  // Instant-delivery showcase loop for the hero mock card. One rAF loop drives
+  // the progress bar (easeOutCubic fill, short delivered hold, clean reset);
+  // the serial digits run on a self-scheduling timeout chain that slows down
+  // as the order completes. The loop pauses while off-screen and every timer
+  // dies with its element, so Visual Editor re-renders cannot accumulate any.
+  window.ApartaMockDelivery = window.ApartaMockDelivery || function (root, options) {
+    if (!root || root.dataset.mockBound) return;
+    root.dataset.mockBound = '1';
+
+    const els = {
+      panel: root.querySelector('[data-mock-panel]'),
+      keyMain: root.querySelector('[data-mock-key-main]'),
+      keyTail: root.querySelector('[data-mock-key-tail]'),
+      bar: root.querySelector('[data-mock-bar]'),
+      pct: root.querySelector('[data-mock-pct]'),
+      status: root.querySelector('[data-mock-status]')
+    };
+    if (!els.bar || !els.keyMain) return;
+
+    const HEX = '0123456789ABCDEF';
+    const group = (n) => Array.from({ length: n }, () => HEX[(Math.random() * 16) | 0]).join('');
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const fillMs = Math.min(8000, Math.max(1500, (options && options.duration) || 3200));
+    const holdMs = Math.max(800, Math.round(fillMs * 0.4));
+    const labels = {
+      processing: (els.status && els.status.dataset.labelProcessing) || 'Processing',
+      fulfilling: (els.status && els.status.dataset.labelFulfilling) || 'Fulfilling',
+      delivering: (els.status && els.status.dataset.labelDelivering) || 'Delivering',
+      delivered: (els.status && els.status.dataset.labelDelivered) || 'Delivered'
+    };
+
+    let progress = 0;
+    let delivered = false;
+    let visible = true;
+    let startedAt = null;
+    let rafId = 0;
+    let charTimer = 0;
+
+    const render = () => {
+      els.bar.style.width = progress + '%';
+      if (els.pct) els.pct.textContent = progress + '%';
+      if (els.status) els.status.textContent = delivered ? labels.delivered : (progress < 40 ? labels.processing : progress < 75 ? labels.fulfilling : labels.delivering);
+    };
+
+    const setDelivered = (value) => {
+      delivered = value;
+      root.classList.toggle('is-delivered', value);
+    };
+
+    const scheduleChars = () => {
+      window.clearTimeout(charTimer);
+      if (reduced || delivered || !visible || !root.isConnected) return;
+      // Slow the character churn as the order resolves so the final key
+      // reads as "locking in" rather than cutting off mid-scramble.
+      const pace = progress > 90 ? 210 : progress > 72 ? 130 : 70;
+      charTimer = window.setTimeout(() => {
+        els.keyMain.textContent = group(4) + '-' + group(4);
+        if (els.keyTail) els.keyTail.textContent = group(4);
+        scheduleChars();
+      }, pace);
+    };
+
+    const stop = () => {
+      if (rafId) window.cancelAnimationFrame(rafId);
+      rafId = 0;
+      window.clearTimeout(charTimer);
+    };
+
+    const loop = (now) => {
+      if (!root.isConnected) { stop(); return; }
+      if (!visible) { rafId = 0; return; }
+      if (startedAt === null) startedAt = now;
+      const elapsed = now - startedAt;
+      if (elapsed <= fillMs) {
+        progress = Math.round((1 - Math.pow(1 - elapsed / fillMs, 3)) * 100);
+      } else if (elapsed <= fillMs + holdMs) {
+        progress = 100;
+      } else {
+        // New cycle: reset state AND re-arm the serial churn together so
+        // every loop animates, not just the first one.
+        startedAt = now;
+        progress = 0;
+        setDelivered(false);
+        scheduleChars();
+      }
+      const done = progress >= 100;
+      if (done !== delivered) {
+        setDelivered(done);
+        if (done) window.clearTimeout(charTimer);
+        else scheduleChars();
+      }
+      render();
+      rafId = window.requestAnimationFrame(loop);
+    };
+
+    if (reduced) {
+      root.classList.add('is-delivered', 'is-static');
+      setDelivered(true);
+      progress = 100;
+      els.keyMain.textContent = '7A2F-9C0E';
+      if (els.keyTail) els.keyTail.textContent = '500B';
+      render();
+      return;
+    }
+
+    if (typeof window.IntersectionObserver === 'function' && els.panel) {
+      new IntersectionObserver((entries) => {
+        visible = entries[0].isIntersecting;
+        if (visible) {
+          scheduleChars();
+          if (!rafId) rafId = window.requestAnimationFrame(loop);
+        } else {
+          stop();
+        }
+      }, { threshold: 0.15 }).observe(els.panel);
+    }
+
+    scheduleChars();
+    rafId = window.requestAnimationFrame(loop);
+  };
+</script>

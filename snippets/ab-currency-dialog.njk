@@ -1,0 +1,6 @@
+<dialog id="ab-currency-dialog" class="ab-currency-dialog" aria-label="Choose currency">
+  <div class="ab-dialog-top"><div><strong>Choose your currency</strong><p class="ab-muted">Prices will update across the store.</p></div><button type="button" class="ab-button" data-ab-close aria-label="Close currency picker">✕</button></div>
+  <div class="ab-currency-search"><label class="ab-search"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><input type="search" placeholder="Search currency or code…" aria-label="Search currencies" data-ab-currency-search></label></div>
+  <div class="ab-currency-options">{% for code, rate in currency_rates_usd %}<button type="button" data-ab-currency-option="{{ code }}" :aria-pressed="appCurrency.currency.toLowerCase() === '{{ code | lower }}'" @click="appCurrency.currency='{{ code | lower }}'; localStorage.setItem('currency',appCurrency.currency); $el.closest('dialog').close()"><span class="ab-currency-symbol">{{ currency_symbols[code] or (code | upper) }}</span><span><strong>{{ code | upper }}</strong><small data-ab-currency-name></small></span><i class="fa-solid fa-check" aria-hidden="true"></i></button>{% endfor %}</div>
+  <p class="ab-currency-empty" data-ab-currency-empty hidden>No currencies match your search.</p>
+</dialog>

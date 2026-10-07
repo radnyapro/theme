@@ -1,0 +1,372 @@
+<div class="container mx-auto">
+  <div class="relative px-4 lg:px-0 py-6 lg:py-8">
+    <div class="w-full mx-auto flex flex-col gap-4 md:gap-6 lg:gap-8 lg:flex-row">
+      <div class="lg:flex-1">
+        {% render_snippet "customer-sidebar.njk" %}
+      </div>
+      <div class="lg:w-3/4">
+        {% if reseller_status == 'approved' %}
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="flex flex-col p-3 md:p-4 lg:p-5 bg-card border border-white/5 rounded-lg">
+              <div class="flex items-start gap-4">
+                {% if reseller_tier and reseller_tier.image_url %}
+                  <img src="{{ reseller_tier.image_url }}" alt="{{ reseller_tier.name }}" class="size-14 shrink-0 rounded-lg border border-white/10 object-cover" loading="lazy" />
+                {% endif %}
+                <div class="min-w-0">
+                  <h3 class="text-base text-t-primary/80">
+                    {{ 'customer.your_tier' | t }}{% if reseller_tier %}: {{ reseller_tier.name }}{% endif %}
+                  </h3>
+                  <p class="text-sm text-t-primary/60 mt-1">
+                    {{ 'reseller.program_hint' | t }}
+                  </p>
+                </div>
+              </div>
+              <div class="flex items-center gap-6 mt-4">
+                {% if reseller_tier %}
+                  <div>
+                    <p class="text-xs text-t-primary/60 uppercase">{{ 'common.discount' | t }}</p>
+                    <p class="text-base text-t-primary font-semibold">{{ reseller_tier.discount_percentage }}%</p>
+                  </div>
+                {% endif %}
+                <div>
+                  <p class="text-xs text-t-primary/60 uppercase">{{ 'reseller.lifetime_spent' | t }}</p>
+                  <p class="text-base text-t-primary font-semibold" x-text="appCurrency.format({{ reseller_total_spent_usd }}, 'USD')">
+                    {{ formatPrice(reseller_total_spent_usd, 'USD') }}
+                  </p>
+                </div>
+                <div>
+                  <p class="text-xs text-t-primary/60 uppercase">{{ 'customer.orders' | t }}</p>
+                  <p class="text-base text-t-primary font-semibold">{{ reseller_total_completed }}</p>
+                </div>
+              </div>
+              {% if reseller_next_tier %}
+                <p class="text-xs text-t-primary/60 mt-4">
+                  {{ 'reseller.next_tier' | t }}
+                  {% if reseller_next_tier.image_url %}<img src="{{ reseller_next_tier.image_url }}" alt="{{ reseller_next_tier.name }}" class="inline-block size-5 rounded border border-white/10 object-cover align-middle mx-0.5" loading="lazy" />{% endif %}
+                  <span class="text-t-primary font-semibold">{{ reseller_next_tier.name }}</span> ({{ reseller_next_tier.discount_percentage }}% discount):
+                  {% if reseller_next_tier.min_spent_usd %}spend {{ formatPrice(reseller_next_tier.min_spent_usd, 'USD') }}{% endif %}
+                  {% if reseller_next_tier.min_spent_usd and reseller_next_tier.min_sales_count %} and {% endif %}
+                  {% if reseller_next_tier.min_sales_count %}{{ reseller_next_tier.min_sales_count }} orders{% endif %}
+                </p>
+              {% endif %}
+            </div>
+            <a href="{{ '/customer/balance' | shopUrl }}" class="flex flex-col p-3 md:p-4 lg:p-5 bg-card border border-white/5 rounded-lg transition ease-in-out duration-300 hover:bg-white/10 hover:border-white/10">
+              <div class="flex items-center justify-between">
+                <h3 class="text-base text-t-primary/80">
+                  {{ 'reseller.balance' | t }}
+                </h3>
+                <span class="text-lg text-t-primary font-semibold" x-text="appCurrency.format({{ shop_customer.balance }}, 'USD')">
+                  {{ formatPrice(shop_customer.balance, 'USD') }}
+                </span>
+              </div>
+              <p class="text-sm text-t-primary/60 mt-1">
+                {{ 'reseller.balance_hint' | t }}
+              </p>
+            </a>
+
+            <div class="flex flex-col p-3 md:p-4 lg:p-5 bg-card border border-white/5 rounded-lg md:col-span-2">
+              <div class="flex items-center justify-between">
+                <h3 class="text-base text-t-primary/80">
+                  {{ 'customer.order_history' | t }}
+                </h3>
+                <a href="{{ '/customer/invoices' | shopUrl }}?reseller=1" class="text-sm">
+                  <span class="text-accent-500 hover:text-accent-600">{{ 'common.view_all' | t }}</span>
+                </a>
+              </div>
+              {% if latest_reseller_invoice %}
+                <div class="mt-2">
+                  <p class="text-2xl text-t-primary font-semibold truncate">
+                    {% if latest_reseller_invoice.items %}
+                      {% if latest_reseller_invoice.items[0].custom_name %}
+                        {{ latest_reseller_invoice.items[0].custom_name }}
+                      {% else %}
+                        {{ latest_reseller_invoice.items[0].product.name }}
+                        {% if latest_reseller_invoice.items[0].variant and latest_reseller_invoice.items[0].product.name != latest_reseller_invoice.items[0].variant.name %}
+                          ({{ latest_reseller_invoice.items[0].variant.name }})
+                        {% endif %}
+                      {% endif %}
+
+                      {% if latest_reseller_invoice.items.length > 1 %}
+                        & {{ latest_reseller_invoice.items.length - 1 }} more
+                      {% endif %}
+                    {% else %}
+                      {{ 'feedback.deleted_product' | t }}
+                    {% endif %}
+                  </p>
+                  <p class="mt-2 text-sm text-t-primary/60">
+                    <a href="{{ latest_reseller_invoice.url }}" target="_blank">
+                      Invoice <span class="text-accent-500 hover:text-accent-600">#{{ latest_reseller_invoice.unique_id }}</span>
+                    </a>
+                     - {{ latest_reseller_invoice.created_at | formatDate }}
+                  </p>
+                </div>
+              {% else %}
+                <p class="text-2xl text-t-primary font-semibold mt-2">
+                  {{ 'common.none' | t }}
+                </p>
+              {% endif %}
+            </div>
+
+            <div class="flex flex-col p-3 md:p-4 lg:p-5 bg-card border border-accent-500/40 rounded-lg md:col-span-2">
+              {% if reseller_connection %}
+                <div class="flex flex-wrap items-center gap-2">
+                  <h3 class="text-base text-t-primary/80">{{ 'reseller.connect_title' | t }}</h3>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-green-500/20 text-green-500">{{ 'reseller.connected_badge' | t }}</span>
+                </div>
+                <div class="flex flex-wrap items-center gap-6 mt-3">
+                  <div>
+                    <p class="text-xs text-t-primary/60 uppercase">{{ 'reseller.connected_store' | t }}</p>
+                    <p class="text-base text-t-primary font-semibold">
+                      <a href="{{ reseller_connection.shop_url }}" target="_blank" rel="noopener" class="hover:text-accent-500 transition-colors duration-300 ease-in-out">{{ reseller_connection.shop_name }}</a>
+                    </p>
+                  </div>
+                  <div>
+                    <p class="text-xs text-t-primary/60 uppercase">{{ 'reseller.connected_since' | t }}</p>
+                    <p class="text-base text-t-primary font-semibold">{{ reseller_connection.connected_at | formatDate }}</p>
+                  </div>
+                  <div>
+                    <p class="text-xs text-t-primary/60 uppercase">{{ 'reseller.connected_products' | t }}</p>
+                    <p class="text-base text-t-primary font-semibold">{{ reseller_connection.linked_products_count }}</p>
+                  </div>
+                </div>
+                <p class="text-sm text-t-primary/60 mt-3">{{ 'reseller.connected_hint' | t }}</p>
+                <div class="mt-3 flex flex-wrap gap-2">
+                  <a
+                    href="{{ reseller_connection.shop_url }}"
+                    target="_blank"
+                    rel="noopener"
+                    class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold border border-white/10 text-t-primary transition hover:bg-white/5"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+                    {{ 'reseller.open_store' | t }}
+                  </a>
+                  <button
+                    type="button"
+                    class="px-4 py-2 rounded-lg text-sm font-semibold border border-white/10 text-red-400 transition hover:bg-white/5"
+                    @click="appReseller.disconnectStore()"
+                  >
+                    {{ 'reseller.disconnect_button' | t }}
+                  </button>
+                </div>
+              {% else %}
+                <div class="flex flex-wrap items-center gap-2">
+                  <h3 class="text-base text-t-primary/80">{{ 'reseller.connect_title' | t }}</h3>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-accent-500/10 text-accent-500">{{ 'reseller.connect_badge' | t }}</span>
+                </div>
+                <p class="text-sm text-t-primary/60 mt-1">{{ 'reseller.connect_hint' | t | safe }}</p>
+                <p class="text-xs text-t-primary/40 mt-1">{{ 'reseller.connect_hint_no_store' | t }}</p>
+                <div class="mt-3">
+                  <button
+                    type="button"
+                    class="px-4 py-2 rounded-lg text-sm font-semibold bg-accent-500 border border-accent-500 text-t-accent transition hover:enabled:bg-accent-500/50 disabled:opacity-50 disabled:pointer-events-none"
+                    @click="appReseller.connectStore()"
+                    :disabled="appReseller.connectLoading"
+                  >
+                    {{ 'reseller.connect_button' | t }}
+                  </button>
+                </div>
+              {% endif %}
+              <p class="text-sm text-red-400 mt-2" x-show="appReseller.connectError" x-text="appReseller.connectError"></p>
+            </div>
+
+            <div class="flex flex-col p-3 md:p-4 lg:p-5 bg-card border border-white/5 rounded-lg">
+              <h3 class="text-base text-t-primary/80">{{ 'reseller.api' | t }}</h3>
+              <p class="text-sm text-t-primary/60 mt-1 flex-1">{{ 'reseller.api_card_hint' | t }}</p>
+              <div class="mt-3 flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  class="px-4 py-2 rounded-lg text-sm font-semibold border border-white/10 text-t-primary transition hover:bg-white/5"
+                  @click="appReseller.openApiModal()"
+                >
+                  {{ 'reseller.manage_api_key' | t }}
+                </button>
+                {% if reseller_api_docs_url %}
+                  <a
+                    href="{{ reseller_api_docs_url }}"
+                    target="_blank"
+                    rel="noopener"
+                    class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold border bg-white/10 text-t-primary/75 border-white/5 transition hover:bg-white/20"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+                    {{ 'common.view_docs' | t }}
+                  </a>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="flex flex-col p-3 md:p-4 lg:p-5 bg-card border border-white/5 rounded-lg">
+              <h3 class="text-base text-t-primary/80">{{ 'reseller.dynamic_delivery' | t }}</h3>
+              <p class="text-sm text-t-primary/60 mt-1 flex-1">{{ 'reseller.dd_card_hint' | t }}</p>
+              <div class="mt-3">
+                <button
+                  type="button"
+                  class="px-4 py-2 rounded-lg text-sm font-semibold border border-white/10 text-t-primary transition hover:bg-white/5"
+                  @click="appReseller.openDeliveryModal()"
+                >
+                  {{ 'reseller.manage_delivery' | t }}
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="mt-4">
+            <div class="flex flex-col p-3 md:p-4 lg:p-5 bg-card border border-white/5 rounded-lg">
+              <h3 class="text-base text-t-primary/80">
+                {{ 'reseller.catalog' | t }}
+              </h3>
+              <p class="text-sm text-t-primary/60 mt-1">
+                {{ 'reseller.catalog_hint' | t }}
+              </p>
+              <div class="mt-4 rounded-lg overflow-x-auto">
+                {% if reseller_catalog.length > 0 %}
+                  <table class="w-full text-left text-sm text-t-primary/80">
+                    <thead class="text-xs text-t-primary/60 uppercase bg-white/5">
+                      <tr>
+                        <th scope="col" class="px-6 py-3">{{ 'common.product' | t }}</th>
+                        <th scope="col" class="px-6 py-3">{{ 'common.price' | t }}</th>
+                        <th scope="col" class="px-6 py-3">{{ 'reseller.your_price' | t }}</th>
+                        <th scope="col" class="px-6 py-3">{{ 'common.stock' | t }}</th>
+                        <th scope="col" class="px-6 py-3">{{ 'reseller.delivery_url' | t }}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for product in reseller_catalog %}
+                        {% for variant in product.variants %}
+                          <tr class="border-b border-white/5">
+                            <td class="px-6 py-4">
+                              <a href="{{ ('/product/' + product.path) | shopUrl }}" class="hover:text-accent-500 transition-colors duration-300 ease-in-out">{{ product.name }}</a>{% if product.variants.length > 1 %} <span class="text-t-primary/60">- {{ variant.name }}</span>{% endif %}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                              <span x-text="appCurrency.format({{ variant.price }}, '{{ product.currency }}')">{{ formatPrice(variant.price, product.currency) }}</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                              <span class="text-t-primary font-semibold" x-text="appCurrency.format({{ variant.reseller_price }}, '{{ product.currency }}')">{{ formatPrice(variant.reseller_price, product.currency) }}</span>
+                              {% if variant.discount_percentage > 0 %}
+                                <span class="text-xs text-green-500 ml-1">-{{ variant.discount_percentage }}%</span>
+                              {% endif %}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                              {% if variant.stock == -1 %}<span aria-label="{{ 'common.unlimited' | t }}">&infin;</span>{% else %}{{ variant.stock }}{% endif %}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                              {% if variant.dynamic_url %}
+                                <button
+                                  type="button"
+                                  x-data="{ copied: false }"
+                                  @click="navigator.clipboard.writeText('{{ variant.dynamic_url }}'); copied = true; setTimeout(() => copied = false, 2000)"
+                                  class="flex items-center gap-2 text-t-primary transition hover:text-accent-500"
+                                  :title="copied ? '{{ 'common.copied' | t | jsEscape }}' : '{{ 'reseller.copy_delivery_url' | t | jsEscape }}'"
+                                >
+                                  <svg x-show="!copied" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                                  <svg x-show="copied" x-cloak class="text-green-500" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-4-4"/></svg>
+                                </button>
+                              {% else %}
+                                <span class="text-t-primary/40">-</span>
+                              {% endif %}
+                            </td>
+                          </tr>
+                        {% endfor %}
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                {% else %}
+                  <p class="text-sm text-t-primary/60">
+                    {{ 'reseller.no_products' | t }}
+                  </p>
+                {% endif %}
+              </div>
+              {% if reseller_catalog_paginator.last_page > 1 %}
+                {% render_snippet "pagination.njk", paginator=reseller_catalog_paginator %}
+              {% endif %}
+            </div>
+          </div>
+
+          {% render_snippet "reseller-api-modal.njk" %}
+          {% render_snippet "reseller-delivery-modal.njk" %}
+        {% elif reseller_status == 'suspended' %}
+          <div class="flex flex-col p-3 md:p-4 lg:p-5 bg-card border border-white/5 rounded-lg">
+            <h3 class="text-base text-t-primary/80">
+              {{ 'reseller.suspended_title' | t }}
+            </h3>
+            <p class="text-sm text-t-primary/60 mt-2">
+              {{ 'reseller.suspended_body' | t }}
+            </p>
+          </div>
+        {% elif reseller_status == 'applied' %}
+          <div class="flex flex-col p-3 md:p-4 lg:p-5 bg-card border border-white/5 rounded-lg">
+            <h3 class="text-base text-t-primary/80">
+              {{ 'reseller.application' | t }}
+            </h3>
+            <p class="text-sm text-t-primary/60 mt-2">
+              {{ 'reseller.application_pending' | t }}
+            </p>
+          </div>
+        {% else %}
+          <div class="flex flex-col p-3 md:p-4 lg:p-5 bg-card border border-white/5 rounded-lg">
+            <h3 class="text-base text-t-primary/80">
+              {{ 'reseller.program' | t }}
+            </h3>
+            {% if reseller_status == 'rejected' %}
+              <p class="text-sm text-t-primary/60 mt-2">
+                Your previous application was not approved.{% if reseller_enrollment_mode == 'application' %} You can apply again below.{% endif %}
+              </p>
+            {% else %}
+              <p class="text-sm text-t-primary/60 mt-2">
+                {{ 'reseller.program_intro' | t }}
+              </p>
+            {% endif %}
+            {% if reseller_enrollment_mode == 'application' %}
+              <form class="mt-4" @submit.prevent="appReseller.apply()">
+                <label class="block text-sm text-t-primary/80">
+                  {{ reseller_application_prompt if reseller_application_prompt else 'Tell us about your store and how you plan to resell.' }}
+                </label>
+                <textarea
+                  rows="4"
+                  maxlength="2000"
+                  x-model="appReseller.applicationAnswer"
+                  class="w-full mt-2 px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-sm text-t-primary focus:outline-none"
+                ></textarea>
+                <p class="text-sm text-red-400 mt-2" x-show="appReseller.applyError" x-text="appReseller.applyError"></p>
+                <button
+                  type="submit"
+                  class="px-6 py-2 mt-3 rounded-lg text-sm font-semibold bg-accent-500 border border-accent-500 text-t-accent transition hover:enabled:bg-accent-500/50 disabled:opacity-50 disabled:pointer-events-none"
+                  :disabled="appReseller.applyLoading"
+                >
+                  {{ 'reseller.submit_application' | t }}
+                </button>
+              </form>
+            {% else %}
+              <p class="text-sm text-t-primary/60 mt-1">
+                {{ 'reseller.contact_to_enroll' | t }}
+              </p>
+            {% endif %}
+            {% if reseller_public_tiers.length > 0 %}
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4">
+                {% for tier in reseller_public_tiers %}
+                  <div class="p-3 bg-white/5 border border-white/5 rounded-lg">
+                    {% if tier.image_url %}
+                      <img src="{{ tier.image_url }}" alt="{{ tier.name }}" class="size-10 rounded-lg border border-white/10 object-cover mb-2" loading="lazy" />
+                    {% endif %}
+                    <p class="text-sm text-t-primary font-semibold">{{ tier.name }}</p>
+                    <p class="text-xs text-t-primary/60 mt-1">
+                      {{ tier.discount_percentage }}% discount
+                      {%- if tier.min_spent_usd %} &middot; {{ formatPrice(tier.min_spent_usd, 'USD') }} spent{% endif %}
+                      {%- if tier.min_sales_count %} &middot; {{ tier.min_sales_count }} orders{% endif %}
+                    </p>
+                  </div>
+                {% endfor %}
+              </div>
+            {% endif %}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="components">
+  {% for componentId in components_order %}
+    {% render_component componentId %}
+  {% endfor %}
+</div>

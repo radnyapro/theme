@@ -1,0 +1,26 @@
+<a class="v6-wall-card" href="{{ (('/product/' + product.path) | shopUrl) if product.path else ('/products' | shopUrl) }}">
+  <div class="v6-wall-card__media">
+    {% if product.image_urls|length > 0 %}
+      <img src="{{ product.image_urls[0] }}" alt="" loading="lazy" decoding="async">
+    {% elif product.image_url %}
+      <img src="{{ product.image_url }}" alt="" loading="lazy" decoding="async">
+    {% else %}
+      <span class="v6-wall-card__ph"><i class="fa-solid fa-box"></i></span>
+    {% endif %}
+    {% if product.type == 'group' %}
+      <em class="v6-wall-card__tag">{{ product.products | length }}</em>
+    {% elif product.category_id and product.category %}
+      <em class="v6-wall-card__tag">{{ product.category.name }}</em>
+    {% endif %}
+  </div>
+  <div class="v6-wall-card__body">
+    <strong>{{ product.name }}</strong>
+    <span>
+      {% if product.min_price %}
+        <span x-text="appCurrency.format({{ product.min_price }}, '{{ product.currency }}')">{{ formatPrice(product.min_price, product.currency) }}</span>
+      {% else %}
+        &nbsp;
+      {% endif %}
+    </span>
+  </div>
+</a>

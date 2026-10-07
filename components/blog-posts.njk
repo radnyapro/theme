@@ -1,0 +1,40 @@
+{% set data = [] %}
+{% if blog_posts %}
+  {% set data = blog_posts %}
+{% elif latest_blog_posts %}
+  {% set data = latest_blog_posts %}
+{% endif %}
+
+<section id="{{ componentId }}" class="component section" data-component-id="{{ componentId }}">
+  <div class="wrap">
+    <div class="section-head {{ 'center' if properties.center_head }}">
+      <span class="eyebrow {{ 'eyebrow-centered' if properties.center_head }}">{{ 'blog.eyebrow' | t }}</span>
+      {% if properties.title %}
+        <h2 class="title">{{ properties.title | renderString }}</h2>
+      {% endif %}
+    </div>
+
+    {% if data|length > 0 %}
+      <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 {{ 'justify-items-center' if properties.centered }}">
+        {% for blogPost in data.slice(0, (properties.amount if properties.amount else data|length)) %}
+          <div class="w-full">
+            {% render_snippet "blog-post-card.njk", blogPost=blogPost %}
+          </div>
+        {% endfor %}
+      </div>
+      {% if blog_posts_paginator.last_page > 1 %}
+        {% render_snippet "pagination.njk", paginator=blog_posts_paginator %}
+      {% elif data|length >= properties.amount %}
+        <div class="flex justify-center mt-8">
+          <a href="{{ '/blog' | shopUrl }}" class="btn btn-ghost">
+            {{ 'blog.view_all' | t }}
+          </a>
+        </div>
+      {% endif %}
+    {% else %}
+      <div class="empty-state">
+        <p>{{ 'blog.none' | t }}</p>
+      </div>
+    {% endif %}
+  </div>
+</section>

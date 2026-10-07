@@ -1,0 +1,12 @@
+<section id="{{ componentId }}" class="component ab-section ab-recommendations" data-component-id="{{ componentId }}" data-ab-rail data-autoplay="{{ 'false' if properties.autoplay == false else 'true' }}" data-interval="{{ properties.interval or 5 }}" {% render_snippet 'ab-section-style.njk' %}>
+  <div class="ab-section-heading"><div><p class="ab-eyebrow">{{ properties.eyebrow or 'KEEP EXPLORING' }}</p><h2>{{ properties.title or 'You may also like' }}</h2></div><div class="ab-rail-controls"><button type="button" class="ab-button" data-ab-rail-prev aria-label="Previous recommendations">←</button><button type="button" class="ab-button" data-ab-rail-next aria-label="Next recommendations">→</button></div></div>
+  <div class="ab-rail-track" tabindex="0" role="region" aria-label="{{ properties.title or 'You may also like' }}">
+    {% set source = sortedItems or [] %}
+    {% if properties.ids | length > 0 %}{% set source = helpers.components.products.getItemsByIds(source, properties.ids) %}{% endif %}
+    {% for item in source %}
+      {% if item.type == 'group' %}{% for product in item.products %}<div class="ab-rail-item" data-product-id="{{ product.id }}">{% render_snippet 'ab-product-card.njk', product=product %}</div>{% endfor %}
+      {% else %}<div class="ab-rail-item" data-product-id="{{ item.id }}">{% render_snippet 'ab-product-card.njk', product=item %}</div>{% endif %}
+    {% endfor %}
+  </div>
+  {% if source | length == 0 %}<p class="ab-muted">No recommendations available right now.</p>{% endif %}
+</section>

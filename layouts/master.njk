@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="{{ lang }}" dir="{{ dir }}" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+    {% render_snippet "meta-tags.njk" %}
+
+    <link href="{{ 'built.css' | assetUrl }}" rel="stylesheet"/>
+    <link href="{{ 'custom.css' | assetUrl }}?v=4" rel="stylesheet"/>
+
+    <style id="theme-styles">
+      :root {
+        --cl-accent: {{ global.properties.accent_color | hex_to_rgb }};
+        --cl-accent-2: {{ (global.properties.accent_color_2 if global.properties.accent_color_2 else '#d16bff') | hex_to_rgb }};
+        --cl-background: {{ global.properties.background_color | hex_to_rgb }};
+        --cl-card: {{ global.properties.card_color | hex_to_rgb }};
+        --cl-border: {{ (global.properties.border_color if global.properties.border_color else '#ff8fc7') | hex_to_rgb }};
+        --cl-t-primary: {{ (global.properties.text_primary_color if global.properties.text_primary_color else '#ffffff') | hex_to_rgb }};
+        --cl-t-accent: {{ (global.properties.text_accent_color if global.properties.text_accent_color else '#ffffff') | hex_to_rgb }};
+        --cl-snow: {{ (global.properties.snow_color if global.properties.snow_color else '#ffffff') | hex_to_rgb }};
+
+        --font-body: '{{ (global.properties.font if global.properties.font else 'Inter') }}', system-ui, sans-serif;
+        --font-display: '{{ (global.properties.display_font if global.properties.display_font else 'Space Grotesk') }}', var(--font-body);
+        --font-mono: '{{ (global.properties.mono_font if global.properties.mono_font else 'JetBrains Mono') }}', ui-monospace, monospace;
+
+        --grad-accent: linear-gradient(105deg, rgb(var(--cl-accent)), rgb(var(--cl-accent-2)));
+        --grad-text: linear-gradient(105deg, color-mix(in srgb, rgb(var(--cl-accent)) 30%, white) 0%, rgb(var(--cl-accent)) 38%, rgb(var(--cl-accent-2)) 72%, color-mix(in srgb, rgb(var(--cl-accent-2)) 60%, #8b5cf6) 100%);
+
+        --radius-card: {{ (global.properties.card_radius if global.properties.card_radius else '20') }}px;
+        --radius-input: {{ (global.properties.input_radius if global.properties.input_radius else '12') }}px;
+        --radius-button: {{ (global.properties.button_radius if global.properties.button_radius else '12') }}px;
+        --control-height: {{ (global.properties.control_height if global.properties.control_height else '44') }}px;
+        --container-w: {{ (global.properties.container_width if global.properties.container_width else '1200') }}px;
+
+        --status-positive: {{ (global.properties.status_positive_color if global.properties.status_positive_color else '#00d294') | hex_to_rgb }};
+        --status-warning: {{ (global.properties.status_warning_color if global.properties.status_warning_color else '#fcbb00') | hex_to_rgb }};
+        --status-error: {{ (global.properties.status_error_color if global.properties.status_error_color else '#ff6568') | hex_to_rgb }};
+
+        --product-card-image-aspect-ratio: {{ (global.properties.product_card_image_aspect_ratio if global.properties.product_card_image_aspect_ratio else '16/9') }};
+        --product-page-image-aspect-ratio: {{ (global.properties.product_page_image_aspect_ratio if global.properties.product_page_image_aspect_ratio else '16/9') }};
+        --group-card-image-aspect-ratio: {{ (global.properties.group_card_image_aspect_ratio if global.properties.group_card_image_aspect_ratio else '16/9') }};
+        --blog-card-image-aspect-ratio: {{ (global.properties.blog_card_image_aspect_ratio if global.properties.blog_card_image_aspect_ratio else '16/9') }};
+        --product-image-fit: {{ (global.properties.product_image_fit if global.properties.product_image_fit else 'cover') }};
+        --group-image-fit: {{ (global.properties.group_image_fit if global.properties.group_image_fit else 'cover') }};
+      }
+
+      html { background-color: rgb(var(--cl-background)); }
+      body { font-family: var(--font-body); }
+    </style>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family={{ (global.properties.font if global.properties.font else 'Inter') | replace(" ", "+") }}:wght@400;500;600;700&family={{ (global.properties.display_font if global.properties.display_font else 'Space Grotesk') | replace(" ", "+") }}:wght@500;600;700&family={{ (global.properties.mono_font if global.properties.mono_font else 'JetBrains Mono') | replace(" ", "+") }}:wght@400;500;600&display=swap" rel="stylesheet" id="theme-font">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet" />
+    <link href="{{ 'splide@4.1.4.min.css' | staticAsset }}" rel="stylesheet" />
+    <link href="{{ 'choices@10.2.0.min.css' | staticAsset }}" rel="stylesheet" />
+    <link href="{{ 'lite-yt-embed@0.3.4.min.css' | staticAsset }}" rel="stylesheet" />
+  </head>
+  <body class="text-t-primary">
+    {% if shop.background_image_url %}
+      <div class="fixed inset-0 z-[-1] bg-center bg-cover pointer-events-none" style="background-image: url({{ shop.background_image_url }});"></div>
+    {% else %}
+      <div class="theme-bg" aria-hidden="true"></div>
+      <div class="theme-grid" aria-hidden="true"></div>
+      {% if global.properties.show_ambient_particles %}
+        <div class="theme-bokeh" aria-hidden="true" x-data="bokeh"></div>
+      {% endif %}
+    {% endif %}
+
+    <div id="app" x-data="app" class="flex flex-col min-h-screen">
+      {% if templateName != 'maintenance' %}
+        <div>
+          {% render_component "announcement" %}
+          {% render_component "header" %}
+        </div>
+      {% endif %}
+
+      <main class="site-main flex-1 {{ 'maintenance-main' if templateName == 'maintenance' }}">
+        {{ templateContent | safe }}
+      </main>
+
+      {% if templateName != 'maintenance' %}
+        {% render_component "footer" %}
+        {% render_snippet "customer-login-modal.njk" %}
+      {% endif %}
+    </div>
+
+    <script>
+      window.shopId = {{ shop.id | json }};
+      window.apiBaseUrl = {{ '' | apiInternalUrl | json }};
+      window.currencyRatesUsd = {{ currency_rates_usd | json }};
+      window.currencySymbols = {{ currency_symbols | json }};
+      window.defaultCurrency = {{ currency | json }};
+      window.shopCustomer = {{ shop_customer | json }};
+      window.affiliateAttributionWindowDays = {{ shop.settings.affiliate.attribution_window_days | json }};
+    </script>
+
+    {% if isBuilder %}
+      {% render_snippet "script-builder.njk" %}
+    {% endif %}
+
+    {% if altcha or altcha_shop_customer %}
+      <script type="module">
+        import { Altcha } from "{{ 'altcha@1.5.1.min.js' | staticAsset }}";
+      </script>
+    {% elif shop.recaptcha_key %}
+      <script src="https://www.google.com/recaptcha/api.js?render={{ shop.recaptcha_key }}"></script>
+    {% endif %}
+
+    <script src="{{ 'js.cookie@3.0.8.min.js' | staticAsset }}"></script>
+    <script src="{{ 'splide@4.1.4.min.js' | staticAsset }}"></script>
+    <script src="{{ 'choices@10.2.0.min.js' | staticAsset }}"></script>
+    <script src="{{ 'lite-yt-embed@0.3.4.min.js' | staticAsset }}"></script>
+    <script
+      src="{{ 'script.js' | assetUrl }}"
+      crossorigin="anonymous"
+    ></script>
+    <script src="{{ 'alpinejs@3.15.12.min.js' | staticAsset }}"></script>
+    <script>
+      document.addEventListener('alpine:init', () => {
+        Alpine.data('bokeh', () => ({
+          init() {
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+            const host = this.$el;
+            const count = window.innerWidth < 768 ? 8 : 16;
+            for (let i = 0; i < count; i++) {
+              const dot = document.createElement('span');
+              dot.className = 'bokeh-dot';
+              const size = 3 + Math.random() * 5;
+              dot.style.width = size + 'px';
+              dot.style.height = size + 'px';
+              dot.style.left = (Math.random() * 100) + 'vw';
+              dot.style.setProperty('--bokeh-drift', (Math.random() * 10 - 3) + 'vw');
+              dot.style.setProperty('--bokeh-opacity', (0.18 + Math.random() * 0.35).toFixed(2));
+              dot.style.animationDuration = (14 + Math.random() * 18) + 's';
+              dot.style.animationDelay = (-Math.random() * 30) + 's';
+              host.appendChild(dot);
+            }
+          }
+        }));
+      });
+    </script>
+
+    {% if global.properties.snow %}
+      <div id="snow"></div>
+      <script>snow({ count: 200 });</script>
+    {% endif %}
+
+    {% render_snippet "script-integrations.njk" %}
+  </body>
+</html>

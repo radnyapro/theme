@@ -1,0 +1,249 @@
+<div
+  x-show="appCustomer.modalIsOpen"
+  x-cloak
+  class="fixed inset-0 z-50 overflow-y-auto"
+  aria-labelledby="login-modal-title"
+  role="dialog"
+  aria-modal="true"
+>
+  <div class="flex items-center justify-center min-h-screen px-4 py-8 text-center">
+    <div
+      x-show="appCustomer.modalIsOpen"
+      x-transition:enter="transition ease-out duration-300 transform"
+      x-transition:enter-start="opacity-0"
+      x-transition:enter-end="opacity-100"
+      x-transition:leave="transition ease-in duration-200 transform"
+      x-transition:leave-start="opacity-100"
+      x-transition:leave-end="opacity-0"
+      @click="appCustomer.modalClose()"
+      class="modal-backdrop"
+      aria-hidden="true"
+    ></div>
+
+    <div
+      x-show="appCustomer.modalIsOpen"
+      x-transition:enter="transition ease-out duration-300 transform"
+      x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+      x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+      x-transition:leave="transition ease-in duration-200 transform"
+      x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+      x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+      class="modal-card gcard-glow text-left"
+    >
+      <div class="flex items-start justify-between gap-4 mb-5">
+        <div>
+          <p class="eyebrow mb-1.5">{{ 'login.lookup_eyebrow' | t }}</p>
+          <h3 id="login-modal-title" class="font-display text-2xl font-bold tracking-tight">
+            {{ 'login.title' | t }}
+          </h3>
+        </div>
+        <button @click="appCustomer.modalClose()" class="icon-btn shrink-0" aria-label="{{ 'common.close' | t }}">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="size-4">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <div x-show="appCustomer.modalStep === 1">
+        <form @submit.prevent="appCustomer.modalRequestOtp()">
+          <div class="field">
+            <label for="login-email">{{ 'login.email' | t }}</label>
+            <small class="text-faint -mt-1 block">
+              {{ 'login.otp_hint' | t }}
+            </small>
+          </div>
+          <div class="mt-2">
+            <input
+              id="login-email"
+              type="email"
+              x-model="appCustomer.modalEmail"
+              x-ref="appCustomer.modalEmailInput"
+              placeholder="name@domain.com"
+              class="input"
+            />
+          </div>
+
+          {% if altcha_shop_customer %}
+            <div
+              x-cloak
+              x-show="!appCustomer.altchaPayload"
+              class="transition-opacity mt-2"
+              x-transition:enter="transition ease-out duration-300 transform"
+              x-transition:enter-start="opacity-0"
+              x-transition:enter-end="opacity-100"
+              x-transition:leave="transition ease-in duration-200 transform"
+              x-transition:leave-start="opacity-100"
+              x-transition:leave-end="opacity-0"
+            >
+              <altcha-widget
+                challengejson='{{ altcha_shop_customer | json }}'
+                auto="onload"
+                hidefooter="true"
+                hidelogo="true"
+                x-ref="appCustomer.altcha"
+              ></altcha-widget>
+            </div>
+          {% endif %}
+
+          <p x-show="appCustomer.modalEmailError" x-cloak class="text-sm mt-2" style="color: rgb(var(--status-error))" x-text="appCustomer.modalEmailError"></p>
+          <button
+            type="submit"
+            class="btn btn-bloom btn-block mt-4"
+            :disabled="appCustomer.modalLoading"
+          >
+            <span>{{ 'common.continue' | t }}</span>
+            <template x-if="!appCustomer.modalLoading">
+              <svg xmlns="http://www.w3.org/2000/svg" class="size-4" fill="currentColor" viewBox="0 0 256 256"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"></path></svg>
+            </template>
+            <template x-if="appCustomer.modalLoading">
+              <svg xmlns="http://www.w3.org/2000/svg" class="size-4 animate-spin" fill="currentColor" viewBox="0 0 256 256"><path d="M232,128a104,104,0,0,1-208,0c0-41,23.81-78.36,60.66-95.27a8,8,0,0,1,6.68,14.54C60.15,61.59,40,93.27,40,128a88,88,0,0,0,176,0c0-34.73-20.15-66.41-51.34-80.73a8,8,0,0,1,6.68-14.54C208.19,49.64,232,87,232,128Z"></path></svg>
+            </template>
+          </button>
+          <button
+            type="button"
+            class="block mx-auto mt-3 text-sm text-muted underline underline-offset-2 transition hover:text-t-primary"
+            @click="appCustomer.modalUsePasswordLogin()"
+          >
+            {{ 'login.use_password' | t }}
+          </button>
+        </form>
+
+        {% if shop.discord_login_enabled and not isBuilder %}
+          <div class="relative mt-5 mb-4" aria-hidden="true">
+            <div class="absolute inset-0 flex items-center"><div class="w-full divider"></div></div>
+            <div class="relative flex justify-center"><span class="px-2 text-[0.68rem] uppercase tracking-[0.16em] text-faint" style="background: transparent">{{ 'login.or' | t }}</span></div>
+          </div>
+          <button
+            type="button"
+            class="btn btn-soft btn-block"
+            :disabled="appCustomer.modalLoading"
+            @click="appCustomer.loginWithDiscord()"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="size-4 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19.27 5.33C17.94 4.71 16.5 4.26 15 4a.1.1 0 0 0-.07.03c-.18.33-.39.76-.53 1.09a16.1 16.1 0 0 0-4.8 0c-.14-.34-.35-.76-.54-1.09c-.01-.02-.04-.03-.07-.03c-1.5.26-2.93.71-4.27 1.33c-.01 0-.02.01-.03.02c-2.72 4.07-3.47 8.03-3.1 11.95c0 .02.01.04.03.05c1.8 1.32 3.53 2.12 5.24 2.65c.03.01.06 0 .07-.02c.4-.55.76-1.13 1.07-1.74c.02-.04 0-.08-.04-.09c-.57-.22-1.11-.48-1.64-.78c-.04-.02-.04-.08-.01-.11c.11-.08.22-.17.33-.25c.02-.02.05-.02.07-.01c3.44 1.57 7.15 1.57 10.55 0c.02-.01.05-.01.07.01c.11.09.22.17.33.26c.04.03.04.09-.01.11c-.52.31-1.07.56-1.64.78c-.04.01-.05.06-.04.09c.32.61.68 1.19 1.07 1.74c.03.01.06.02.09.01c1.72-.53 3.45-1.33 5.25-2.65c.02-.01.03-.03.03-.05c.44-4.53-.73-8.46-3.1-11.95c-.01-.01-.02-.02-.04-.02M8.52 14.91c-1.03 0-1.89-.95-1.89-2.12s.84-2.12 1.89-2.12c1.06 0 1.9.96 1.89 2.12c0 1.17-.84 2.12-1.89 2.12m6.97 0c-1.03 0-1.89-.95-1.89-2.12s.84-2.12 1.89-2.12c1.06 0 1.9.96 1.89 2.12c0 1.17-.83 2.12-1.89 2.12"/></svg>
+            <span>{{ 'login.continue_with_discord' | t }}</span>
+          </button>
+          <p x-show="appCustomer.discordError === 'blocked'" x-cloak class="text-sm mt-2 text-center" style="color: rgb(var(--status-error))">{{ 'login.discord_popup_blocked' | t }}</p>
+          <p x-show="appCustomer.discordError === 'failed'" x-cloak class="text-sm mt-2 text-center" style="color: rgb(var(--status-error))">{{ 'login.discord_failed' | t }}</p>
+          <p x-show="appCustomer.discordError && appCustomer.discordError !== 'blocked' && appCustomer.discordError !== 'failed'" x-cloak class="text-sm mt-2 text-center" style="color: rgb(var(--status-error))" x-text="appCustomer.discordError"></p>
+        {% endif %}
+      </div>
+
+      <div x-show="appCustomer.modalStep === 2 && appCustomer.modalUsePassword" x-cloak>
+        <form @submit.prevent="appCustomer.modalLogin()">
+          <div class="field">
+            <label for="login-password">{{ 'common.password' | t }}</label>
+            <small class="text-faint -mt-1 block">
+              <span x-html="'{{ 'login.password_for' | t | jsEscape }}'.replace('{email}', appCustomer.modalEmail)"></span>
+            </small>
+          </div>
+          <div class="mt-2">
+            <input
+              id="login-password"
+              type="password"
+              x-model="appCustomer.modalPassword"
+              placeholder="{{ 'login.password_placeholder' | t }}"
+              class="input"
+            />
+          </div>
+          <p x-show="appCustomer.modalOtpError" x-cloak class="text-sm mt-2" style="color: rgb(var(--status-error))" x-text="appCustomer.modalOtpError"></p>
+          <button
+            type="submit"
+            class="btn btn-bloom btn-block mt-4"
+            :disabled="appCustomer.modalLoading"
+          >
+            <span>{{ 'common.continue' | t }}</span>
+            <template x-if="!appCustomer.modalLoading">
+              <svg xmlns="http://www.w3.org/2000/svg" class="size-4" fill="currentColor" viewBox="0 0 256 256"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"></path></svg>
+            </template>
+            <template x-if="appCustomer.modalLoading">
+              <svg xmlns="http://www.w3.org/2000/svg" class="size-4 animate-spin" fill="currentColor" viewBox="0 0 256 256"><path d="M232,128a104,104,0,0,1-208,0c0-41,23.81-78.36,60.66-95.27a8,8,0,0,1,6.68,14.54C60.15,61.59,40,93.27,40,128a88,88,0,0,0,176,0c0-34.73-20.15-66.41-51.34-80.73a8,8,0,0,1,6.68-14.54C208.19,49.64,232,87,232,128Z"></path></svg>
+            </template>
+          </button>
+          <button
+            type="button"
+            class="block mx-auto mt-3 text-sm text-muted underline underline-offset-2 transition hover:text-t-primary"
+            @click="appCustomer.modalUseOtpLogin()"
+          >
+            {{ 'login.use_email_code' | t }}
+          </button>
+        </form>
+      </div>
+
+      <div x-show="appCustomer.modalStep === 2 && !appCustomer.modalUsePassword">
+        <form @submit.prevent="appCustomer.modalLogin()">
+          <div class="field">
+            <label>{{ 'login.otp' | t }}</label>
+            <small class="text-faint -mt-1 block">
+              <span x-html="'{{ 'login.otp_sent' | t | jsEscape }}'.replace('{email}', appCustomer.modalEmail)"></span>
+            </small>
+          </div>
+          <div class="flex gap-2 mt-2">
+            {% for index in range(6) %}
+              <input
+                type="text"
+                inputmode="numeric"
+                maxlength="1"
+                x-model="appCustomer.modalOtpDigits[{{ index }}]"
+                x-ref="appCustomer.modalOtpInputs[{{ index }}]"
+                @input="appCustomer.modalOtpHandleInput({{ index }})"
+                @keydown="appCustomer.modalOtpHandleKeyDown({{ index }}, $event)"
+                class="input text-center text-lg font-mono2"
+                style="width: 2.75rem;"
+              />
+            {% endfor %}
+          </div>
+          <p x-show="appCustomer.modalOtpError" x-cloak class="text-sm mt-2" style="color: rgb(var(--status-error))" x-text="appCustomer.modalOtpError"></p>
+          <button
+            type="submit"
+            class="btn btn-bloom btn-block mt-4"
+            :disabled="appCustomer.modalLoading"
+          >
+            <span>{{ 'common.continue' | t }}</span>
+            <template x-if="!appCustomer.modalLoading">
+              <svg xmlns="http://www.w3.org/2000/svg" class="size-4" fill="currentColor" viewBox="0 0 256 256"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"></path></svg>
+            </template>
+            <template x-if="appCustomer.modalLoading">
+              <svg xmlns="http://www.w3.org/2000/svg" class="size-4 animate-spin" fill="currentColor" viewBox="0 0 256 256"><path d="M232,128a104,104,0,0,1-208,0c0-41,23.81-78.36,60.66-95.27a8,8,0,0,1,6.68,14.54C60.15,61.59,40,93.27,40,128a88,88,0,0,0,176,0c0-34.73-20.15-66.41-51.34-80.73a8,8,0,0,1,6.68-14.54C208.19,49.64,232,87,232,128Z"></path></svg>
+            </template>
+          </button>
+        </form>
+      </div>
+
+      <div x-show="appCustomer.modalStep === 3" x-cloak>
+        <form @submit.prevent="appCustomer.modalLogin()">
+          <div class="field">
+            <label for="login-tfa">{{ 'login.two_factor' | t }}</label>
+            <small class="text-faint -mt-1 block">
+              {{ 'login.tfa_hint' | t }}
+            </small>
+          </div>
+          <div class="mt-2">
+            <input
+              id="login-tfa"
+              type="text"
+              maxlength="8"
+              autocomplete="one-time-code"
+              x-model="appCustomer.modalTfaCode"
+              placeholder="{{ 'login.authenticator_code' | t }}"
+              class="input font-mono2"
+            />
+          </div>
+          <p x-show="appCustomer.modalTfaError" x-cloak class="text-sm mt-2" style="color: rgb(var(--status-error))" x-text="appCustomer.modalTfaError"></p>
+          <button
+            type="submit"
+            class="btn btn-bloom btn-block mt-4"
+            :disabled="appCustomer.modalLoading"
+          >
+            <span>{{ 'common.continue' | t }}</span>
+            <template x-if="!appCustomer.modalLoading">
+              <svg xmlns="http://www.w3.org/2000/svg" class="size-4" fill="currentColor" viewBox="0 0 256 256"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"></path></svg>
+            </template>
+            <template x-if="appCustomer.modalLoading">
+              <svg xmlns="http://www.w3.org/2000/svg" class="size-4 animate-spin" fill="currentColor" viewBox="0 0 256 256"><path d="M232,128a104,104,0,0,1-208,0c0-41,23.81-78.36,60.66-95.27a8,8,0,0,1,6.68,14.54C60.15,61.59,40,93.27,40,128a88,88,0,0,0,176,0c0-34.73-20.15-66.41-51.34-80.73a8,8,0,0,1,6.68-14.54C208.19,49.64,232,87,232,128Z"></path></svg>
+            </template>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
